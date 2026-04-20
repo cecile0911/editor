@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ChangeMe</title>
+    <script src="https://unpkg.com/konva@10/konva.min.js"></script>
+
+    <link rel="stylesheet" href="reset.css" />
+
+    <link rel="stylesheet" href="style.css" />
+
+    <script src="main.js" defer></script>
+  </head>
+  <body>
+    <!-- 弹窗（保留） -->
+    <dialog id="introDialog">
+      <p>This website functions as a client-side image editing tool.</p>
+      <p>
+        All uploaded content is processed locally within the user's browser and
+        is not stored, transmitted, or shared by the system.
+      </p>
+      <p>
+        Users are solely responsible for ensuring that they have the necessary
+        rights or permissions to use uploaded images.
+      </p>
+      <p>This project is for educational use only.</p>
+      <button id="dialogCloseButton" autofocus>OK</button>
+    </dialog>
+
+    <!-- ⭐ Header -->
+    <header>
+      <h1>Image Editor</h1>
+    </header>
+
+    <!-- ⭐ 主内容 -->
+    <main id="wrapper">
+      <!-- 上传按钮 -->
+      <label for="upload" class="upload-btn"> Upload Image </label>
+      <input type="file" id="upload" accept="image/*" hidden />
+      <div class="hint">
+        <p>Click "Upload Image" to start</p>
+        <small>Then drag, resize, and edit your image</small>
+      </div>
+      <!-- 画布 -->
+      <div id="stageContainer"></div>
+    </main>
+  </body>
+</html>

@@ -13,7 +13,8 @@
     <script src="main.js" defer></script>
   </head>
   <body>
-    <!-- 弹窗（保留） -->
+    <!-- pop-up windows -->
+    <!-- This statement is provided in consideration of potential copyright issues. -->
     <dialog id="introDialog">
       <p>This website functions as a client-side image editing tool.</p>
       <p>
@@ -28,21 +29,20 @@
       <button id="dialogCloseButton" autofocus>OK</button>
     </dialog>
 
-    <!-- ⭐ Header -->
     <header>
       <h1>Image Editor</h1>
     </header>
 
-    <!-- ⭐ 主内容 -->
     <main id="wrapper">
-      <!-- 上传按钮 -->
+      <!-- upload button here -->
       <label for="upload" class="upload-btn"> Upload Image </label>
       <input type="file" id="upload" accept="image/*" hidden />
+      <!-- hint for navigation -->
       <div class="hint">
         <p>Click "Upload Image" to start</p>
         <small>Then drag, resize, and edit your image</small>
       </div>
-      <!-- 画布 -->
+      <!-- Canvas here -->
       <div id="stageContainer"></div>
     </main>
   </body>

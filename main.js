@@ -6,18 +6,18 @@ document.getElementById("dialogCloseButton").addEventListener("click", () => {
   introModal.close();
 });
 
-// 创建舞台
+// create new stage
 var stage = new Konva.Stage({
   container: "stageContainer",
   width: window.innerWidth,
   height: window.innerHeight,
 });
 
-// 图层
+// create new layer
 var layer = new Konva.Layer();
 stage.add(layer);
 
-// 监听上传
+//
 document.getElementById("upload").addEventListener("change", function (e) {
   var file = e.target.files[0];
   if (!file) return;
@@ -34,7 +34,7 @@ document.getElementById("upload").addEventListener("change", function (e) {
         x: 50,
         y: 50,
         image: img,
-        draggable: true, // 可以拖动
+        draggable: true, // enable dragging
       });
 
       layer.add(konvaImage);

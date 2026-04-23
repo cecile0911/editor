@@ -1,11 +1,9 @@
-/* 页面整体 */
 body {
   margin: 0;
   font-family: sans-serif;
   background: #f0f0f0;
 }
 
-/* header */
 header {
   height: 80px;
   background: #222;
@@ -15,7 +13,7 @@ header {
   padding-left: 20px;
 }
 
-/* 主区域 */
+/* main */
 #wrapper {
   display: flex;
   flex-direction: column;
@@ -24,7 +22,6 @@ header {
   gap: 20px;
 }
 
-/* 上传按钮 */
 .upload-btn {
   padding: 10px 20px;
   background: #333;
@@ -37,7 +34,7 @@ header {
   background: #555;
 }
 
-/* 画布 */
+/* canvas */
 #stageContainer {
   width: 800px;
   height: 500px;
@@ -50,7 +47,6 @@ header {
   z-index: 0;
 }
 
-/* 提示文字 */
 .hint {
   text-align: center;
   color: #777;
@@ -59,4 +55,5 @@ header {
 .hint small {
   font-size: 12px;
   color: #aaa;
+  /* I chose this color to make it different from main text */
 }

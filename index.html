@@ -35,15 +35,95 @@
 
     <main id="wrapper">
       <!-- upload button here -->
-      <label for="upload" class="upload-btn"> Upload Image </label>
+      <label for="upload" class="upload-btn">UPLOAD IMAGE</label>
       <input type="file" id="upload" accept="image/*" hidden />
+      <!-- put the menu bar here -->
+      <div class="toolbar">
+        <button id="grayBtn">Grayscale</button>
+        <button id="sepiaBtn">Sepia</button>
+        <button id="invertBtn">Invert</button>
+        <button id="resetFilterBtn">Reset Filter</button>
+        <!-- set two slider here -->
+
+        <label class="slider-card brightness-card">
+          <span class="slider-title">Brightness</span>
+
+          <p class="slider-note">
+            Softly brighten the uploaded image and create a dreamy magazine-like
+            mood.
+          </p>
+
+          <input
+            id="brightnessSlider"
+            type="range"
+            min="-1"
+            max="1"
+            step="0.1"
+            value="0"
+          />
+        </label>
+
+        <label class="slider-card contrast-card">
+          <span class="slider-title">Contrast</span>
+
+          <p class="slider-note">
+            Increase shadows and highlights for a sharper printed-photo
+            appearance.
+          </p>
+
+          <input
+            id="contrastSlider"
+            type="range"
+            min="-100"
+            max="100"
+            step="1"
+            value="0"
+          />
+        </label>
+      </div>
+
+      <div class="sticker-panel">
+        <div class="sticker-row">
+          <span class="sticker-title">STICKER FILE</span>
+
+          <button class="sticker-btn" data-sticker="♡">♡</button>
+          <button class="sticker-btn" data-sticker="☆">☆</button>
+          <button class="sticker-btn" data-sticker="✦">✦</button>
+          <button class="sticker-btn" data-sticker="→">→</button>
+          <button class="sticker-btn" data-sticker="TOKYO">TOKYO</button>
+          <button class="sticker-btn" data-sticker="1998">1998</button>
+          <button class="sticker-btn" data-sticker="カワイイ">カワイイ</button>
+          <button class="sticker-btn" data-sticker="CUTIE">CUTIE</button>
+        </div>
+
+        <div class="sticker-style">
+          <span>TEXT STYLE</span>
+          <button class="style-btn active" data-style="magazine">
+            MAGAZINE
+          </button>
+          <button class="style-btn" data-style="cute">CUTE</button>
+          <button class="style-btn" data-style="bold">BOLD</button>
+          <button class="style-btn" data-style="soft">SOFT</button>
+          <button class="style-btn" data-style="gothic">GOTHIC</button>
+        </div>
+
+        <div class="sticker-actions">
+          <button id="deleteStickerBtn">DELETE SELECTED</button>
+          <button id="undoBtn">UNDO</button>
+        </div>
+      </div>
       <!-- hint for navigation -->
       <div class="hint">
         <p>Click "Upload Image" to start</p>
         <small>Then drag, resize, and edit your image</small>
       </div>
+
       <!-- Canvas here -->
       <div id="stageContainer"></div>
+      <div class="download-area">
+        <p>When you finish editing, download your image below</p>
+        <button id="downloadBtn">DOWNLOAD IMAGE</button>
+      </div>
     </main>
   </body>
 </html>

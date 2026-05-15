@@ -67,12 +67,16 @@ document.getElementById("upload").addEventListener("change", function (e) {
 
       konvaImage.width(img.width * scale);
       konvaImage.height(img.height * scale);
-
       layer.add(konvaImage);
 
       konvaImage.cache();
 
       selectNode(konvaImage);
+
+      undoStack.push({
+        type: "add",
+        node: konvaImage,
+      });
     };
   };
 
@@ -297,8 +301,9 @@ document.getElementById("downloadBtn").addEventListener("click", () => {
 
   layer.draw();
 });
+// 确保能删除的包含图片本身
 document.getElementById("deleteStickerBtn").addEventListener("click", () => {
-  if (!selectedNode || selectedNode.className !== "Text") return;
+  if (!selectedNode) return;
 
   const deletedNode = selectedNode;
 

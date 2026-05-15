@@ -35,51 +35,68 @@
 
     <main id="wrapper">
       <!-- upload button here -->
-      <label for="upload" class="upload-btn">UPLOAD IMAGE</label>
+      <label for="upload" class="upload-btn">UPLOAD IMAGE❤</label>
       <input type="file" id="upload" accept="image/*" hidden />
       <!-- put the menu bar here -->
       <div class="toolbar">
-        <button id="grayBtn">Grayscale</button>
-        <button id="sepiaBtn">Sepia</button>
-        <button id="invertBtn">Invert</button>
-        <button id="resetFilterBtn">Reset Filter</button>
-        <!-- set two slider here -->
+        <div class="filter-cluster">
+          <button id="grayBtn">Grayscale</button>
+          <button id="sepiaBtn">Sepia</button>
+          <button id="invertBtn">Invert</button>
+          <button id="resetFilterBtn">Reset Filter</button>
+        </div>
 
-        <label class="slider-card brightness-card">
-          <span class="slider-title">Brightness</span>
+        <div class="slider-cluster">
+          <label class="slider-card brightness-card">
+            <div class="slider-heading">
+              <span class="slider-title">Brightness</span>
+              <span class="slider-jp">明るさ<br />･････</span>
+            </div>
 
-          <p class="slider-note">
-            Softly brighten the uploaded image and create a dreamy magazine-like
-            mood.
-          </p>
+            <p class="slider-jp-note">
+              やさしく明るくして、ふんわり夢のような雰囲気に。
+            </p>
 
-          <input
-            id="brightnessSlider"
-            type="range"
-            min="-1"
-            max="1"
-            step="0.1"
-            value="0"
-          />
-        </label>
+            <p class="slider-note">
+              Softly brighten the uploaded image and create a dreamy
+              magazine-like mood.
+            </p>
 
-        <label class="slider-card contrast-card">
-          <span class="slider-title">Contrast</span>
+            <input
+              id="brightnessSlider"
+              type="range"
+              min="-1"
+              max="1"
+              step="0.1"
+              value="0"
+            />
+          </label>
 
-          <p class="slider-note">
-            Increase shadows and highlights for a sharper printed-photo
-            appearance.
-          </p>
+          <label class="slider-card contrast-card">
+            <div class="slider-heading">
+              <span class="slider-title">Contrast</span>
+              <span class="slider-jp">コントラスト<br />･････</span>
+            </div>
 
-          <input
-            id="contrastSlider"
-            type="range"
-            min="-100"
-            max="100"
-            step="1"
-            value="0"
-          />
-        </label>
+            <p class="slider-jp-note">
+              影と光をくっきりさせて、写真をシャープに。
+            </p>
+
+            <p class="slider-note">
+              Increase shadows and highlights for a sharper printed-photo
+              appearance.
+            </p>
+
+            <input
+              id="contrastSlider"
+              type="range"
+              min="-100"
+              max="100"
+              step="1"
+              value="0"
+            />
+          </label>
+        </div>
       </div>
 
       <div class="sticker-panel">
@@ -122,7 +139,7 @@
       <div id="stageContainer"></div>
       <div class="download-area">
         <p>When you finish editing, download your image below</p>
-        <button id="downloadBtn">DOWNLOAD IMAGE</button>
+        <button id="downloadBtn">DOWNLOAD IMAGE❤</button>
       </div>
     </main>
   </body>

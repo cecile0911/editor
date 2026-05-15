@@ -61,17 +61,18 @@ button,
   font-family: Arial, Helvetica, sans-serif;
 }
 header {
-  margin-bottom: 26px;
+  margin-bottom: 8px;
   transform: rotate(-4deg);
   position: relative;
   z-index: 30;
 }
+/* image editor */
 header h1 {
   position: relative;
   margin: 0;
 
   font-family: "Times New Roman", Georgia, serif;
-  font-size: 58px;
+  font-size: 96px;
   font-style: italic;
   font-weight: 700;
 
@@ -79,12 +80,12 @@ header h1 {
 
   background: rgba(176, 88, 128, 0.78);
 
-  padding: 18px 56px 20px;
+  padding: 26px 90px 30px;
 
-  letter-spacing: -3px;
+  letter-spacing: -5px;
   line-height: 1;
 
-  clip-path: polygon(8% 0, 100% 0, 94% 100%, 0 100%);
+  clip-path: polygon(4% 0, 100% 0, 96% 100%, 0 100%);
 
   box-shadow:
     12px 12px 0 rgba(224, 91, 126, 0.42),
@@ -96,20 +97,23 @@ header h1 {
 }
 
 header h1::after {
-  content: "イメージエディター / TOKYO 1998";
+  content: "イメージエディター  /  TOKYO 1998";
 
   display: block;
 
-  margin-top: 8px;
+  margin-top: 12px;
+  margin-left: 18px;
 
-  font-family: Arial, sans-serif;
-  font-size: 11px;
+  font-family: "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
+  font-size: 14px;
   font-style: normal;
-  font-weight: 700;
+  font-weight: 900;
 
   color: #ffe8f3;
 
-  letter-spacing: 4px;
+  letter-spacing: 6px;
+  line-height: 1;
+
   text-shadow: none;
 }
 /* main */
@@ -118,31 +122,45 @@ header h1::after {
   flex-direction: column;
   align-items: center;
   gap: 16px;
-}
 
+  margin-top: 42px;
+}
 .upload-btn,
 #downloadBtn {
+  /* softer paper-label feeling */
   background: rgba(248, 226, 174, 0.92);
-  color: #7d295c;
 
-  padding: 13px 28px;
+  color: #8f3e67;
 
-  border-radius: 2px;
+  border: none;
 
-  font-weight: 900;
-  font-size: 14px;
-  letter-spacing: 1.5px;
+  padding: 18px 56px;
 
-  box-shadow: 8px 8px 0 rgba(176, 88, 128, 0.2);
+  /* changed from industrial narrow font
+     to magazine serif italic */
+  font-family: Georgia, "Times New Roman", serif;
+
+  font-size: 24px;
+
+  font-style: italic;
+  font-weight: 700;
+
+  letter-spacing: 1px;
+
+  box-shadow: 10px 10px 0 rgba(224, 91, 126, 0.16);
+
+  transform: rotate(-1deg);
+
   cursor: pointer;
 
-  transform: rotate(-2deg);
+  transition: 0.15s ease;
 }
 
 .upload-btn:hover,
 #downloadBtn:hover {
   background: rgba(255, 244, 248, 0.95);
-  transform: rotate(-2deg) translateY(-3px);
+  transform: translateY(-2px) rotate(-1deg);
+  opacity: 0.92;
 }
 
 /* canvas */
@@ -194,8 +212,8 @@ header h1::after {
   font-weight: bold;
   letter-spacing: 0.5px;
 
-  margin-top: 10px;
-  margin-bottom: 40px;
+  margin-top: -8px;
+  margin-bottom: 12px;
 
   position: relative;
   z-index: 30;
@@ -206,116 +224,171 @@ header h1::after {
   color: #aaa;
   /* I chose this color to make it different from main text */
 }
+
+/* TOOLBAR: separates filter buttons and slider area */
 .toolbar {
-  position: relative;
-  z-index: 20;
-
-  width: 100%;
-  height: 230px;
-
-  display: block;
-
-  margin-bottom: 10px;
-  padding: 0;
-
-  border: none;
-  backdrop-filter: none;
-}
-#resetFilterBtn {
-  position: absolute;
-  left: 56%;
-  top: 28px;
-
-  transform: rotate(5deg);
-}
-
-.toolbar button {
-  border: none;
-
-  color: white;
-
-  padding: 9px 22px;
-
-  border-radius: 0;
-
-  font-family: "Arial Narrow", Arial, Helvetica, sans-serif;
-  font-weight: 800;
-  font-size: 13px;
-
-  box-shadow: 7px 7px 0 rgba(176, 88, 128, 0.2);
-
-  cursor: pointer;
-
-  letter-spacing: 1.4px;
-  text-transform: uppercase;
-
-  opacity: 0.9;
-}
-.toolbar button:nth-child(1) {
-  background: rgba(224, 91, 126, 0.9);
-}
-
-.toolbar button:nth-child(2) {
-  background: rgba(176, 88, 128, 0.86);
-}
-
-.toolbar button:nth-child(3) {
-  background: rgba(111, 190, 177, 0.88);
-}
-
-.toolbar button:nth-child(4) {
-  background: rgba(248, 226, 174, 0.95);
-  color: #8f3e67;
-}
-.slider-card {
-  position: absolute;
-  width: 320px;
+  width: min(1400px, 92vw);
 
   display: grid;
-  grid-template-columns: 120px 160px;
-  grid-template-rows: auto auto;
+  grid-template-columns: 44% 56%;
+  gap: 40px;
 
-  column-gap: 16px;
+  align-items: start;
+
+  margin-top: 10px;
+  margin-bottom: -20px;
+
+  position: relative;
+  z-index: 20;
+}
+
+/* FILTER BUTTON CLUSTER */
+/* 需要反复调整 符合布局需求 */
+.filter-cluster {
+  position: relative;
+  min-height: 220px;
+  transform: translate(-40px, -70px);
+}
+
+.filter-cluster button {
+  position: absolute;
+
+  border: none;
+  color: white;
+
+  padding: 11px 26px;
+
+  font-family: "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 900;
+
+  letter-spacing: 2px;
+  text-transform: uppercase;
+
+  box-shadow: 10px 10px 0 rgba(176, 88, 128, 0.18);
+
+  cursor: pointer;
+}
+
+#grayBtn {
+  left: 50px;
+  top: 10px;
+  background: rgba(224, 91, 126, 0.92);
+  transform: rotate(-5deg);
+}
+
+#invertBtn {
+  left: 250px;
+  top: 20px;
+  background: rgba(111, 190, 177, 0.88);
+  transform: rotate(-3deg);
+}
+
+#sepiaBtn {
+  left: 100px;
+  top: 90px;
+  background: rgba(176, 88, 128, 0.86);
+  transform: rotate(7deg);
+}
+
+#resetFilterBtn {
+  left: 250px;
+  top: 90px;
+  background: rgba(248, 226, 174, 0.95);
+  color: #8f3e67;
+  transform: rotate(4deg);
+}
+
+/* SLIDER AREA */
+.slider-cluster {
+  position: relative;
+  min-height: 300px;
+  transform: translate(280px, -80px);
+}
+
+.slider-card {
+  position: absolute;
+
+  width: 560px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 
   color: #3c202d;
 }
 
+.brightness-card {
+  left: 130px;
+  top: -50px;
+  transform: rotate(-2deg);
+}
+
+.contrast-card {
+  left: -150px;
+  top: 100px;
+  transform: rotate(5deg);
+}
+
+.slider-heading {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+
+  background: rgba(255, 244, 248, 0.76);
+
+  padding: 9px 18px 10px;
+
+  box-shadow: 10px 10px 0 rgba(224, 91, 126, 0.14);
+}
+
 .slider-title {
-  grid-column: 1;
-  grid-row: 1;
-
-  display: inline-block;
-  width: fit-content;
-
-  background: rgba(255, 230, 238, 0.42);
-
-  padding: 1px 5px;
-
   font-family: Georgia, "Times New Roman", serif;
-  font-size: 22px;
+  font-size: 34px;
   font-style: italic;
   font-weight: 700;
 
-  letter-spacing: -1px;
-  line-height: 1;
+  line-height: 0.9;
+  letter-spacing: -2px;
 
-  color: #8f3e67;
+  color: #9b4470;
+}
 
-  opacity: 0.95;
+.slider-jp {
+  font-family: "Hiragino Kaku Gothic Pro", "Yu Gothic", Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 900;
+
+  line-height: 1.3;
+  letter-spacing: 2px;
+
+  color: #9b4470;
+}
+
+.slider-jp-note {
+  margin: 12px 0 6px 8px;
+
+  font-family: "Hiragino Kaku Gothic Pro", "Yu Gothic", Arial, sans-serif;
+  font-size: 12px;
+  font-weight: 800;
+
+  letter-spacing: 1px;
+  line-height: 1.5;
+
+  color: rgba(35, 20, 25, 0.9);
 }
 
 .slider-note {
-  grid-column: 1 / 2;
-  grid-row: 2;
+  width: 380px;
 
-  width: 118px;
+  margin: 0 0 24px 8px;
 
-  margin: 7px 0 0 0;
+  font-family: "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
+  font-size: 12px;
+  line-height: 1.45;
+  font-weight: 900;
 
-  font-size: 7px;
-  line-height: 1.35;
-  font-weight: 800;
-  letter-spacing: 0.35px;
+  letter-spacing: 1px;
 
   color: rgba(35, 20, 25, 0.9);
 
@@ -323,51 +396,11 @@ header h1::after {
 }
 
 .slider-card input[type="range"] {
-  grid-column: 2;
-  grid-row: 1;
+  width: 340px;
 
-  width: 150px;
-  margin-top: 6px;
+  margin-left: 8px;
 
   accent-color: #e05b7e;
-}
-.brightness-card {
-  left: 62%;
-  top: 18px;
-  transform: rotate(-2deg);
-}
-
-.contrast-card {
-  left: 62%;
-  top: 116px;
-  transform: rotate(2deg);
-}
-#grayBtn {
-  position: absolute;
-  left: 13%;
-  top: 34px;
-  transform: rotate(-6deg) skewX(-8deg);
-}
-
-#sepiaBtn {
-  position: absolute;
-  left: 22%;
-  top: 92px;
-  transform: rotate(6deg) skewX(-8deg);
-}
-
-#invertBtn {
-  position: absolute;
-  left: 27%;
-  top: 40px;
-  transform: rotate(-4deg) skewX(-8deg);
-}
-
-#resetFilterBtn {
-  position: absolute;
-  left: 33%;
-  top: 94px;
-  transform: rotate(4deg) skewX(-8deg);
 }
 
 header,
@@ -382,53 +415,84 @@ header,
   z-index: 20;
 }
 
+/* ==============================
+   STICKER PANEL
+   Reason:
+   Make this area feel like a 90s Japanese magazine material box,
+   not a normal website toolbar.
+================================= */
+
 .sticker-panel {
   position: relative;
   z-index: 25;
 
+  width: fit-content;
+  max-width: 1000px;
+
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 14px;
 
-  margin-top: -20px;
-  margin-bottom: 32px;
+  margin-top: -80px;
+  margin-bottom: 8px;
 
-  padding: 14px 20px;
+  padding: 20px 30px;
 
-  background: rgba(255, 230, 238, 0.42);
-  box-shadow: 10px 10px 0 rgba(176, 88, 128, 0.16);
+  background: rgba(255, 230, 238, 0.38);
+
+  box-shadow: 12px 12px 0 rgba(176, 88, 128, 0.14);
 
   transform: rotate(-1deg);
 
-  font-family: "Arial Narrow", Arial, Helvetica, sans-serif;
+  /* Reason:
+     This keeps the panel slightly like a paper collage piece. */
 }
+
+/* ==============================
+   ROW LAYOUT
+================================= */
 
 .sticker-row,
 .sticker-style,
 .sticker-actions {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   flex-wrap: wrap;
 }
-/* center allign the buttons */
+
+/* Reason:
+   Center action buttons so DELETE / UNDO feel like a small control area,
+   not part of the sticker list. */
 .sticker-actions {
   justify-content: center;
-
   width: 100%;
-
   margin-top: 4px;
 }
+
+/* ==============================
+   SMALL CATEGORY TITLES
+================================= */
+
 .sticker-title,
 .sticker-style span {
-  margin-right: 8px;
+  margin-right: 12px;
 
-  font-size: 11px;
-  font-weight: 900;
-  letter-spacing: 3px;
+  font-family: "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+
+  letter-spacing: 5px;
 
   color: rgba(35, 20, 25, 0.82);
+
+  /* Reason:
+     Thin, spaced-out sans-serif text feels more like magazine annotation text. */
 }
+
+/* ==============================
+   BASIC BUTTON SHAPE
+================================= */
 
 .sticker-btn,
 .style-btn,
@@ -436,47 +500,120 @@ header,
 #undoBtn {
   border: none;
 
-  padding: 6px 11px;
-
-  background: rgba(248, 226, 174, 0.82);
-  color: #8f3e67;
+  padding: 7px 14px;
 
   cursor: pointer;
 
-  box-shadow: 5px 5px 0 rgba(224, 91, 126, 0.2);
+  box-shadow: 7px 7px 0 rgba(224, 91, 126, 0.18);
+
+  transition: 0.15s ease;
+
+  /* Reason:
+     No white border. The offset shadow creates a printed paper-layer effect. */
 }
 
+/* ==============================
+   STICKER BUTTONS
+================================= */
+
 .sticker-btn {
+  background: rgba(248, 226, 174, 0.82);
+
+  color: #8f3e67;
+
+  border: none;
+
+  padding: 8px 16px;
+
   font-family: Georgia, "Times New Roman", serif;
-  font-size: 15px;
+
+  font-size: 19px;
+
   font-style: italic;
   font-weight: 700;
 
-  transform: rotate(-2deg);
-}
+  box-shadow: 7px 7px 0 rgba(224, 91, 126, 0.16);
 
+  transform: rotate(-2deg);
+
+  cursor: pointer;
+}
+/* Reason:
+   Alternating soft green and cream makes the stickers feel collected,
+   like different magazine labels. */
 .sticker-btn:nth-child(odd) {
   background: rgba(174, 212, 162, 0.62);
   transform: rotate(2deg);
 }
 
-.style-btn,
-#deleteStickerBtn,
-#undoBtn {
-  font-family: "Arial Narrow", Arial, Helvetica, sans-serif;
-  font-size: 11px;
-  font-style: normal;
-  font-weight: 900;
-  letter-spacing: 1.5px;
+/* English title-like stickers */
+.sticker-btn[data-sticker="TOKYO"],
+.sticker-btn[data-sticker="1998"],
+.sticker-btn[data-sticker="CUTIE"] {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 20px;
+  font-style: italic;
+  font-weight: 700;
+
+  letter-spacing: -0.5px;
 }
 
+/* Japanese sticker */
+.sticker-btn[data-sticker="カワイイ"] {
+  font-family: "Hiragino Maru Gothic Pro", "Yu Gothic", sans-serif;
+  font-size: 17px;
+  font-style: normal;
+  font-weight: 700;
+
+  letter-spacing: 2px;
+}
+
+/* ==============================
+   STYLE BUTTONS
+================================= */
+
+.style-btn {
+  background: rgba(248, 226, 174, 0.82);
+  color: #8f3e67;
+
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 15px;
+  font-style: italic;
+  font-weight: 700;
+
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+/* Reason:
+   Active button should look like a selected magazine label,
+   not a modern UI tab. */
 .style-btn.active {
-  background: rgba(224, 91, 126, 0.82);
+  background: rgba(224, 91, 126, 0.86);
   color: white;
+
+  transform: rotate(-2deg);
+
+  box-shadow: 7px 7px 0 rgba(176, 88, 128, 0.24);
+}
+
+/* ==============================
+   ACTION BUTTONS
+================================= */
+
+#deleteStickerBtn,
+#undoBtn {
+  font-family: "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 900;
+
+  letter-spacing: 2px;
+  text-transform: uppercase;
 }
 
 #deleteStickerBtn {
-  background: rgba(176, 88, 128, 0.78);
+  background: rgba(176, 88, 128, 0.8);
   color: white;
 }
 
@@ -485,9 +622,14 @@ header,
   color: #3c202d;
 }
 
+/* ==============================
+   HOVER
+================================= */
+
 .sticker-btn:hover,
 .style-btn:hover,
 #deleteStickerBtn:hover,
 #undoBtn:hover {
-  transform: translateY(-2px);
+  transform: translateY(-2px) rotate(-1deg);
+  opacity: 0.92;
 }

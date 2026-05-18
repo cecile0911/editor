@@ -8,8 +8,8 @@ document.getElementById("dialogCloseButton").addEventListener("click", () => {
 });
 
 // create stage
-const stageWidth = Math.min(window.innerWidth * 0.92, 1400);
-const stageHeight = 780;
+const stageWidth = 960;
+const stageHeight = 620;
 
 var stage = new Konva.Stage({
   container: "stageContainer",
@@ -61,8 +61,8 @@ document.getElementById("upload").addEventListener("change", function (e) {
         draggable: true,
       });
 
-      const maxWidth = 1100;
-      const maxHeight = 650;
+      const maxWidth = 860;
+      const maxHeight = 520;
       const scale = Math.min(maxWidth / img.width, maxHeight / img.height, 1);
 
       konvaImage.width(img.width * scale);

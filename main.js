@@ -8,8 +8,8 @@ document.getElementById("dialogCloseButton").addEventListener("click", () => {
 });
 
 // create stage
-const stageWidth = Math.min(window.innerWidth * 0.92, 1400);
-const stageHeight = 780;
+const stageWidth = Math.min(window.innerWidth * 0.7, 760);
+const stageHeight = 560;
 
 var stage = new Konva.Stage({
   container: "stageContainer",
@@ -61,8 +61,8 @@ document.getElementById("upload").addEventListener("change", function (e) {
         draggable: true,
       });
 
-      const maxWidth = 1100;
-      const maxHeight = 650;
+      const maxWidth = 620;
+      const maxHeight = 480;
       const scale = Math.min(maxWidth / img.width, maxHeight / img.height, 1);
 
       konvaImage.width(img.width * scale);
@@ -72,6 +72,13 @@ document.getElementById("upload").addEventListener("change", function (e) {
       konvaImage.cache();
 
       selectNode(konvaImage);
+      // 确保图片被添加进konva再滚动
+      setTimeout(() => {
+        document.getElementById("stageContainer").scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+        });
+      }, 100);
 
       undoStack.push({
         type: "add",
@@ -81,6 +88,9 @@ document.getElementById("upload").addEventListener("change", function (e) {
   };
 
   reader.readAsDataURL(file);
+
+  /* clear input value so uploading the same image again can still trigger change */
+  e.target.value = "";
 });
 
 // filters only work on images

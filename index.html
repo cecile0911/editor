@@ -16,17 +16,26 @@
     <!-- pop-up windows -->
     <!-- This statement is provided in consideration of potential copyright issues. -->
     <dialog id="introDialog">
-      <p>This website functions as a client-side image editing tool.</p>
-      <p>
-        All uploaded content is processed locally within the user's browser and
-        is not stored, transmitted, or shared by the system.
-      </p>
-      <p>
-        Users are solely responsible for ensuring that they have the necessary
-        rights or permissions to use uploaded images.
-      </p>
-      <p>This project is for educational use only.</p>
-      <button id="dialogCloseButton" autofocus>OK</button>
+      <div class="dialog-paper">
+        <div class="dialog-kicker">編集メモ / EDITOR NOTE</div>
+
+        <h2>Image Use Note</h2>
+
+        <div class="dialog-content">
+          <p>
+            This website works as a client-side image editing tool. Uploaded
+            images are processed locally in your browser.
+          </p>
+
+          <p>Please use images you have the rights or permission to edit.</p>
+
+          <p class="dialog-small">
+            TOKYO 1998 / EDUCATIONAL USE ONLY / LOCAL BROWSER EDIT
+          </p>
+        </div>
+
+        <button id="dialogCloseButton" autofocus>I UNDERSTAND ♥</button>
+      </div>
     </dialog>
 
     <header>
@@ -34,109 +43,180 @@
     </header>
 
     <main id="wrapper">
+      <!-- upper decorative magazine elements -->
+      <!-- Reason: These are only visual decorations for the top empty area. -->
+      <!-- upper decorative magazine elements -->
+      <!-- Reason: keep fewer decorations so the header and upload button stay as the focus. -->
+      <div class="upper-deco-layer" aria-hidden="true">
+        <div class="big-bg-word word-tokyo">TOKYO</div>
+        <div class="big-bg-word word-girl">GIRL</div>
+
+        <div class="upper-note note-kawaii">かわいく加工しよう！</div>
+
+        <div class="mini-label label-vol">VOL.05</div>
+        <div class="mini-label label-girly">girly mix</div>
+
+        <div class="dotted-line dotted-one">・・・・・・・・・・・</div>
+      </div>
+      <!-- decorative magazine elements -->
+      <div class="deco-layer" aria-hidden="true">
+        <div class="deco-tape tape-left">special<br />edition ♥</div>
+        <div class="deco-heart">kira<br />kira ☆</div>
+        <div class="deco-issue">'98<br />ISSUE<br /><strong>05</strong></div>
+        <img src="images/star-doodle.png" class="header-star" />
+        <div class="deco-star star-two">✦</div>
+        <div class="deco-note note-one">scroll<br />down! ♡</div>
+        <div class="deco-note note-two">
+          adjust<br />and create<br />your mood!
+        </div>
+        <div class="deco-label label-sweet">sweet<br />mode ♥</div>
+        <div class="deco-barcode">
+          TOKYO 1998
+          <div></div>
+          <small>9805 1998</small>
+        </div>
+      </div>
       <!-- upload button here -->
       <label for="upload" class="upload-btn">UPLOAD IMAGE❤</label>
       <input type="file" id="upload" accept="image/*" hidden />
-      <!-- put the menu bar here -->
-      <div class="toolbar">
-        <div class="filter-cluster">
-          <button id="grayBtn">Grayscale</button>
-          <button id="sepiaBtn">Sepia</button>
-          <button id="invertBtn">Invert</button>
-          <button id="resetFilterBtn">Reset Filter</button>
-        </div>
-
-        <div class="slider-cluster">
-          <label class="slider-card brightness-card">
-            <div class="slider-heading">
-              <span class="slider-title">Brightness</span>
-              <span class="slider-jp">明るさ<br />･････</span>
-            </div>
-
-            <p class="slider-jp-note">
-              やさしく明るくして、ふんわり夢のような雰囲気に。
-            </p>
-
-            <p class="slider-note">
-              Softly brighten the uploaded image and create a dreamy
-              magazine-like mood.
-            </p>
-
-            <input
-              id="brightnessSlider"
-              type="range"
-              min="-1"
-              max="1"
-              step="0.1"
-              value="0"
-            />
-          </label>
-
-          <label class="slider-card contrast-card">
-            <div class="slider-heading">
-              <span class="slider-title">Contrast</span>
-              <span class="slider-jp">コントラスト<br />･････</span>
-            </div>
-
-            <p class="slider-jp-note">
-              影と光をくっきりさせて、写真をシャープに。
-            </p>
-
-            <p class="slider-note">
-              Increase shadows and highlights for a sharper printed-photo
-              appearance.
-            </p>
-
-            <input
-              id="contrastSlider"
-              type="range"
-              min="-100"
-              max="100"
-              step="1"
-              value="0"
-            />
-          </label>
-        </div>
-      </div>
-
-      <div class="sticker-panel">
-        <div class="sticker-row">
-          <span class="sticker-title">STICKER FILE</span>
-
-          <button class="sticker-btn" data-sticker="♡">♡</button>
-          <button class="sticker-btn" data-sticker="☆">☆</button>
-          <button class="sticker-btn" data-sticker="✦">✦</button>
-          <button class="sticker-btn" data-sticker="→">→</button>
-          <button class="sticker-btn" data-sticker="TOKYO">TOKYO</button>
-          <button class="sticker-btn" data-sticker="1998">1998</button>
-          <button class="sticker-btn" data-sticker="カワイイ">カワイイ</button>
-          <button class="sticker-btn" data-sticker="CUTIE">CUTIE</button>
-        </div>
-
-        <div class="sticker-style">
-          <span>TEXT STYLE</span>
-          <button class="style-btn active" data-style="magazine">
-            MAGAZINE
-          </button>
-          <button class="style-btn" data-style="cute">CUTE</button>
-          <button class="style-btn" data-style="bold">BOLD</button>
-          <button class="style-btn" data-style="soft">SOFT</button>
-          <button class="style-btn" data-style="gothic">GOTHIC</button>
-        </div>
-
-        <div class="sticker-actions">
-          <button id="deleteStickerBtn">DELETE SELECTED</button>
-          <button id="undoBtn">UNDO</button>
-        </div>
-      </div>
+      <!-- 加入引导 -->
       <!-- hint for navigation -->
       <div class="hint">
         <p>Click "Upload Image" to start</p>
         <small>Then drag, resize, and edit your image</small>
       </div>
+      <div class="scroll-arrow">
+        <span>⇣</span>
+        <small>SCROLL TO EDIT</small>
+      </div>
+      <!-- put the menu bar here -->
+      <!-- editor layout: left tools / center canvas / right adjustment panels -->
+      <section class="editor-layout">
+        <!-- left magazine-style filter card -->
+        <aside class="filter-card">
+          <h2>FILTER MODE</h2>
+          <small>フィルターモード</small>
 
-      <!-- Canvas here -->
-      <div id="stageContainer"></div>
+          <div class="filter-item">
+            <button id="grayBtn">Grayscale</button>
+            <p>classic monochrome tone.</p>
+          </div>
+
+          <div class="filter-item">
+            <button id="invertBtn">Invert</button>
+            <p>reverse the colors for a bold look.</p>
+          </div>
+
+          <div class="filter-item">
+            <button id="sepiaBtn">Sepia</button>
+            <p>warm vintage photograph mood.</p>
+          </div>
+
+          <div class="filter-item">
+            <button id="resetFilterBtn">Reset Filter</button>
+            <p>clear all filter settings.</p>
+          </div>
+        </aside>
+
+        <!-- center canvas area -->
+        <section class="canvas-zone">
+          <div class="canvas-sticker-label">NEW!</div>
+          <div id="stageContainer"></div>
+
+          <p class="canvas-note">
+            ☆ DRAG & DROP IMAGE / MOVE / SCALE / ROTATE ☆
+          </p>
+        </section>
+
+        <!-- right adjustment and sticker archive -->
+        <aside class="right-panel">
+          <div class="slider-cluster">
+            <label class="slider-card brightness-card">
+              <div class="slider-heading">
+                <span class="slider-title">Brightness</span>
+                <span class="slider-jp">明るさ<br />･････</span>
+              </div>
+
+              <p class="slider-jp-note">
+                やさしく明るくして、ふんわり夢のような雰囲気に。
+              </p>
+
+              <p class="slider-note">
+                Softly brighten the uploaded image and create a dreamy
+                magazine-like mood.
+              </p>
+
+              <input
+                id="brightnessSlider"
+                type="range"
+                min="-1"
+                max="1"
+                step="0.1"
+                value="0"
+              />
+            </label>
+
+            <label class="slider-card contrast-card">
+              <div class="slider-heading">
+                <span class="slider-title">Contrast</span>
+                <span class="slider-jp">コントラスト<br />･････</span>
+              </div>
+
+              <p class="slider-jp-note">
+                影と光をくっきりさせて、写真をシャープに。
+              </p>
+
+              <p class="slider-note">
+                Increase shadows and highlights for a sharper printed-photo
+                appearance.
+              </p>
+
+              <input
+                id="contrastSlider"
+                type="range"
+                min="-100"
+                max="100"
+                step="1"
+                value="0"
+              />
+            </label>
+          </div>
+
+          <div class="sticker-panel">
+            <div class="sticker-row">
+              <span class="sticker-title">STICKER ARCHIVE</span>
+
+              <button class="sticker-btn" data-sticker="♡">♡</button>
+              <button class="sticker-btn" data-sticker="☆">☆</button>
+              <button class="sticker-btn" data-sticker="✦">✦</button>
+              <button class="sticker-btn" data-sticker="→">→</button>
+              <button class="sticker-btn" data-sticker="TOKYO">TOKYO</button>
+              <button class="sticker-btn" data-sticker="1998">1998</button>
+              <button class="sticker-btn" data-sticker="カワイイ">
+                カワイイ
+              </button>
+              <button class="sticker-btn" data-sticker="CUTIE">CUTIE</button>
+            </div>
+
+            <div class="sticker-style">
+              <span>TEXT STYLE</span>
+              <button class="style-btn active" data-style="magazine">
+                MAGAZINE
+              </button>
+              <button class="style-btn" data-style="cute">CUTE</button>
+              <button class="style-btn" data-style="bold">BOLD</button>
+              <button class="style-btn" data-style="soft">SOFT</button>
+              <button class="style-btn" data-style="gothic">GOTHIC</button>
+            </div>
+
+            <div class="sticker-actions">
+              <button id="deleteStickerBtn">DELETE SELECTED</button>
+              <button id="undoBtn">UNDO</button>
+            </div>
+          </div>
+        </aside>
+      </section>
+
       <div class="download-area">
         <p>When you finish editing, download your image below</p>
         <button id="downloadBtn">DOWNLOAD IMAGE❤</button>

@@ -728,6 +728,19 @@ header h1::after {
   background: rgba(111, 190, 177, 0.72);
   color: #3c202d;
 }
+/* clear canvas button */
+
+#clearCanvasBtn {
+  background: #f6e1a6;
+
+  color: #8f3e67;
+
+  transform: rotate(-2deg);
+}
+
+#clearCanvasBtn:hover {
+  transform: rotate(1deg) scale(1.04);
+}
 /* ==============================
    DECORATIVE MAGAZINE LAYER
    Reason:

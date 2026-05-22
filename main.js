@@ -354,3 +354,22 @@ document.getElementById("undoBtn").addEventListener("click", () => {
 
   layer.draw();
 });
+const clearCanvasBtn = document.getElementById("clearCanvasBtn");
+/* =========================================
+   clear entire canvas
+========================================= */
+
+clearCanvasBtn.addEventListener("click", () => {
+  // remove every editable object
+  layer.destroyChildren();
+
+  // reset selected object
+  selectedNode = null;
+
+  // reset sliders
+  brightnessSlider.value = 0;
+  contrastSlider.value = 0;
+
+  // redraw
+  layer.draw();
+});

@@ -3,7 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ChangeMe</title>
+    <title>ImageEditor</title>
+    <script src="https://unpkg.com/konva@10/konva.min.js"></script>
+    <link rel="icon" type="image/png" href="images/favicon.png" />
     <script src="https://unpkg.com/konva@10/konva.min.js"></script>
 
     <link rel="stylesheet" href="reset.css" />
@@ -211,6 +213,10 @@
 
             <div class="sticker-actions">
               <button id="deleteStickerBtn">DELETE SELECTED</button>
+
+              <!-- clears every editable object on canvas -->
+              <button id="clearCanvasBtn">CLEAR ALL</button>
+
               <button id="undoBtn">UNDO</button>
             </div>
           </div>

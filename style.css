@@ -3,7 +3,9 @@ body {
   margin: 0;
   position: relative;
   overflow-x: hidden;
-
+  /* I wanted to create a collage magazine-style effect, so the background design uses overlapping rectangles in different colors and angles. */
+  /* For the color palette, I referenced some 90s Japanese fashion magazine covers, mainly using pink and purple, while adding yellow and mint green as contrasting accent colors to avoid visual fatigue caused by too many similar tones. */
+  /* The largest areas of the page use a desaturated dusty pink tone to ensure the background does not overpower the main visual focus. */
   background:
   /* dusty rose top block */
     linear-gradient(168deg, rgba(176, 88, 128, 0.58) 0 15%, transparent 15%),
@@ -48,11 +50,6 @@ body {
   font-family: Arial, sans-serif;
   padding-top: 30px;
 }
-button,
-.upload-btn,
-.sticker-btn {
-  font-family: "Arial Narrow", Arial, Helvetica, sans-serif;
-}
 
 .slider-note,
 .hint,
@@ -60,6 +57,7 @@ button,
 .sticker-title {
   font-family: Arial, Helvetica, sans-serif;
 }
+/* The rotated angle imitates the style of magazine headlines, while the added shadow helps the title stand out and appear more visually attractive than the other text on the webpage. */
 header {
   margin-bottom: 8px;
   transform: rotate(-4deg);
@@ -77,7 +75,7 @@ header h1 {
   font-weight: 700;
 
   color: #fff7fb;
-  /* 修改颜色 */
+  /* The saturation of the title background color was increased to prevent the heading from blending into the grey-toned background. */
   background: rgba(171, 40, 99, 0.78);
 
   padding: 26px 90px 30px;
@@ -95,7 +93,7 @@ header h1 {
     3px 3px 0 rgba(224, 91, 126, 0.85),
     6px 6px 0 rgba(255, 255, 255, 0.2);
 }
-
+/* Font size and weight were adjusted to establish a clear visual hierarchy. The addition of katakana also helps emphasize the Japanese magazine-inspired aesthetic. The idea of perfectly centering the subtitles was intentionally avoided to create a slight sense of irregularity and freedom. */
 header h1::after {
   content: "イメージエディター  /  TOKYO 1998";
 
@@ -155,14 +153,14 @@ header h1::after {
 
   transition: 0.15s ease;
 }
-
+/* Provides an interactive button experience. */
 .upload-btn:hover,
 #downloadBtn:hover {
   background: rgba(255, 244, 248, 0.95);
   transform: translateY(-2px) rotate(-1deg);
   opacity: 0.92;
 }
-/* 箭头 */
+/* arrow style */
 .scroll-arrow {
   margin-top: 50px;
   margin-bottom: -10px;
@@ -225,31 +223,7 @@ header h1::after {
     transform: translateY(0);
   }
 }
-/* canvas */
-#stageContainer {
-  width: min(760px, 70vw);
-  height: 560px;
 
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.18),
-    rgba(255, 255, 255, 0.04)
-  );
-
-  border: 2px solid rgba(255, 255, 255, 0.42);
-
-  border-radius: 26px;
-
-  backdrop-filter: blur(6px);
-
-  box-shadow:
-    0 24px 50px rgba(0, 0, 0, 0.12),
-    inset 0 0 40px rgba(255, 255, 255, 0.06);
-
-  overflow: hidden;
-
-  position: relative;
-}
 .download-area {
   text-align: center;
 
@@ -289,7 +263,7 @@ header h1::after {
 
 /* ==============================
    MAIN EDITOR LAYOUT
-   Reason:
+  
    Use a stable 3-column structure instead of huge absolute top values.
    This keeps the magazine style but makes the editor easier to use.
 ================================= */
@@ -312,7 +286,7 @@ header h1::after {
 
 /* ==============================
    LEFT FILTER CARD
-   Reason:
+  
    This changes the left buttons from loose UI buttons into a magazine sidebar.
 ================================= */
 
@@ -401,7 +375,7 @@ header h1::after {
 
   transform: rotate(-2deg);
 }
-
+/* The button colors continue the contrasting color approach, also inspired by the small subtitle elements commonly seen on 90s Japanese magazine covers. */
 #grayBtn {
   background: rgba(224, 91, 126, 0.9);
 }
@@ -435,10 +409,11 @@ header h1::after {
 
 /* ==============================
    CENTER CANVAS
-   Reason:
+   
    Add small decorative labels around the canvas, not inside the functional area.
+   
 ================================= */
-
+/* The canvas itself uses a semi-transparent design so it can blend naturally with the overall webpage. The blurred effect in the center helps maintain visual harmony while still keeping the canvas distinguishable. */
 .canvas-zone {
   position: relative;
 
@@ -472,7 +447,7 @@ header h1::after {
 
 #stageContainer {
   width: min(760px, 70vw);
-  height: 560px;
+  height: 640px;
 
   background: linear-gradient(
     135deg,
@@ -508,7 +483,7 @@ header h1::after {
 
 /* ==============================
    RIGHT PANEL
-   Reason:
+   
    Keep brightness/contrast and sticker archive close, like a magazine side column.
 ================================= */
 
@@ -619,10 +594,10 @@ header h1::after {
 
 /* ==============================
    STICKER ARCHIVE
-   Reason:
+   
    Make sticker controls feel like a small sticker archive sheet.
 ================================= */
-
+/* Most buttons here use lighter colors, but in a few areas I introduced highly saturated pink and light mint green to create subtle visual focal points and prevent the interface from feeling too visually scattered. */
 .sticker-panel {
   width: 300px;
 
@@ -743,9 +718,10 @@ header h1::after {
 }
 /* ==============================
    DECORATIVE MAGAZINE LAYER
-   Reason:
+   
    These elements are only visual decoration.
    They imitate tape, issue labels, doodles, and handwritten magazine notes.
+   This section was added during the later stage of adjusting the overall layout, helping the first screen users see feel less empty. The tape-inspired geometric shape also works as a cute decorative element.
 ================================= */
 
 .deco-layer {
@@ -780,6 +756,11 @@ header h1::after {
   line-height: 1.1;
 
   transform: rotate(-8deg);
+  mask-image:
+    radial-gradient(circle at left, transparent 0 2px, black 3px),
+    linear-gradient(black, black);
+
+  mask-composite: intersect;
 }
 
 .deco-heart {
@@ -834,12 +815,6 @@ header h1::after {
 
   font-size: 42px;
   font-family: Georgia, "Times New Roman", serif;
-}
-
-.star-one {
-  top: 74px;
-  left: 22%;
-  transform: rotate(-18deg);
 }
 
 .star-two {
@@ -923,7 +898,7 @@ header h1::after {
 }
 /* ==============================
    UPPER DECORATION LAYER
-   Reason:
+  
    Keep the top area rich, but reduce visual noise.
    Fewer decorations create clearer magazine hierarchy.
 ================================= */
@@ -942,7 +917,7 @@ header h1::after {
   font-family: Georgia, "Times New Roman", serif;
   font-style: italic;
   font-weight: 900;
-  /* 大字透明度 */
+  /* transparency */
   color: rgba(255, 255, 255, 0.11);
 
   text-shadow: 6px 6px 0 rgba(224, 91, 126, 0.1);
@@ -988,13 +963,6 @@ header h1::after {
   font-weight: 700;
 
   transform: rotate(5deg);
-}
-
-.note-scroll {
-  top: 360px;
-  right: 36%;
-
-  transform: rotate(-12deg);
 }
 
 /* small paper labels */
@@ -1050,7 +1018,7 @@ header h1::after {
 }
 /* ==============================
    COLOR / PRINT ENHANCEMENT
-   Reason:
+   
    Stronger contrast makes the pastel magazine style less grey.
 ================================= */
 
@@ -1084,37 +1052,7 @@ header h1::after {
 #undoBtn {
   background: rgba(91, 184, 172, 0.86);
 }
-/* ==============================
-   PAPER TEXTURE
-   Reason:
-   A subtle grain overlay makes the page feel more printed,
-   closer to a 90s magazine surface.
-================================= */
 
-body::after {
-  content: "";
-
-  position: fixed;
-  inset: 0;
-
-  pointer-events: none;
-  z-index: 999;
-
-  opacity: 0.08;
-
-  background-image:
-    radial-gradient(rgba(255, 255, 255, 0.7) 0.5px, transparent 0.5px),
-    radial-gradient(rgba(80, 30, 55, 0.35) 0.4px, transparent 0.4px);
-
-  background-size:
-    6px 6px,
-    9px 9px;
-  background-position:
-    0 0,
-    3px 4px;
-
-  mix-blend-mode: overlay;
-}
 .header-star {
   position: absolute;
 
@@ -1131,9 +1069,6 @@ body::after {
 }
 /* ==============================
    INTRO DIALOG
-   Reason:
-   Make the notice feel like a 90s Japanese magazine information column,
-   instead of a modern scrapbook card.
 ================================= */
 
 #introDialog {
@@ -1212,6 +1147,7 @@ body::after {
 }
 
 /* use png doodle star */
+/* Hand-drawn stars were added to maintain the sticky note-like artistic style of the pop-up window, while also softening the potentially off-putting feeling that the disclaimer text itself might create for users. */
 .dialog-paper::after {
   content: "";
 
@@ -1226,6 +1162,7 @@ body::after {
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
+  transform: rotate(20deg);
 
   opacity: 0.82;
 
@@ -1262,16 +1199,6 @@ body::after {
 }
 
 /* small bottom info */
-.dialog-small {
-  margin-top: 12px !important;
-
-  font-size: 11px !important;
-  letter-spacing: 5px !important;
-
-  line-height: 1.8;
-
-  opacity: 0.55;
-}
 
 .dialog-small {
   margin-top: 18px !important;
@@ -1284,7 +1211,7 @@ body::after {
   text-transform: uppercase;
 }
 
-/* small label-like button, not modern CTA */
+/* small label-like button*/
 #dialogCloseButton {
   margin-top: 12px;
 
@@ -1310,4 +1237,115 @@ body::after {
 #dialogCloseButton:hover {
   transform: translateY(-2px) rotate(-2deg);
   opacity: 0.9;
+}
+
+/* ==============================
+   STICKER ACTION AREA CHANGES
+
+   Separate DELETE / CLEAR / UNDO from sticker buttons.
+   These are functional control buttons, so they need stronger spacing
+   and a different visual weight.
+================================= */
+
+.sticker-actions {
+  width: 100%;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  gap: 14px;
+
+  /* more space from text style buttons above */
+  margin-top: 22px;
+  margin-bottom: 2px;
+
+  padding-top: 14px;
+
+  border-top: 2px dotted rgba(143, 62, 103, 0.28);
+}
+
+#deleteStickerBtn,
+#clearCanvasBtn,
+#undoBtn {
+  padding: 8px 14px;
+
+  font-family: "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 900;
+
+  letter-spacing: 2px;
+  text-transform: uppercase;
+
+  box-shadow: 5px 5px 0 rgba(176, 88, 128, 0.18);
+
+  transform: rotate(-1deg);
+}
+
+/* stronger warning/action button */
+#deleteStickerBtn {
+  background: rgba(224, 70, 118, 0.95);
+  color: white;
+}
+
+/* clear all should look different from delete */
+#clearCanvasBtn {
+  background: rgba(248, 226, 174, 0.95);
+  color: #8f3e67;
+
+  border: 2px solid rgba(60, 32, 45, 0.75);
+}
+
+/* undo remains softer */
+#undoBtn {
+  background: rgba(91, 184, 172, 0.9);
+  color: #3c202d;
+}
+
+#deleteStickerBtn:hover,
+#clearCanvasBtn:hover,
+#undoBtn:hover {
+  transform: translateY(-2px) rotate(-1deg);
+  opacity: 0.9;
+}
+/* ==============================
+   EXTRA BUTTON HOVER STATES
+
+   Interactive effects were added to all remaining buttons.
+================================= */
+
+/* filter buttons on the left panel */
+.filter-item button:hover {
+  transform: translateY(-2px) rotate(-2deg);
+  opacity: 0.9;
+
+  box-shadow: 7px 7px 0 rgba(176, 88, 128, 0.22);
+}
+
+/* sticker buttons */
+.sticker-btn:hover {
+  transform: translateY(-2px) rotate(-2deg);
+  opacity: 0.9;
+
+  box-shadow: 7px 7px 0 rgba(176, 88, 128, 0.18);
+}
+
+/* keep odd sticker buttons tilted the other way */
+.sticker-btn:nth-child(odd):hover {
+  transform: translateY(-2px) rotate(2deg);
+}
+
+/* text style buttons */
+.style-btn:hover {
+  transform: translateY(-2px) rotate(-1deg);
+  opacity: 0.9;
+
+  box-shadow: 7px 7px 0 rgba(176, 88, 128, 0.2);
+}
+
+/* active style button should still feel selected */
+.style-btn.active:hover {
+  transform: translateY(-2px) rotate(-2deg);
+  opacity: 0.95;
 }

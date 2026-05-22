@@ -4,9 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ImageEditor</title>
+    <!-- favicon here -->
+    <!-- The favicon uses the website’s primary color palette — pink and beige — to maintain a harmonious visual style with the rest of the site. Since star motifs are used repeatedly throughout the website as decorative elements, a star shape was chosen as the main element of the favicon.-->
     <script src="https://unpkg.com/konva@10/konva.min.js"></script>
     <link rel="icon" type="image/png" href="images/favicon.png" />
-    <script src="https://unpkg.com/konva@10/konva.min.js"></script>
 
     <link rel="stylesheet" href="reset.css" />
 
@@ -17,8 +18,10 @@
   <body>
     <!-- pop-up windows -->
     <!-- This statement is provided in consideration of potential copyright issues. -->
+
     <dialog id="introDialog">
       <div class="dialog-paper">
+        <!-- The sticker-inspired subtitles combine both English and Japanese text to create a Japanese magazine-style aesthetic. The highly saturated pink background helps the headings stand out more effectively and draws the user’s attention.-->
         <div class="dialog-kicker">編集メモ / EDITOR NOTE</div>
 
         <h2>Image Use Note</h2>
@@ -45,15 +48,16 @@
     </header>
 
     <main id="wrapper">
+      <!-- These are only visual decorations for the top empty area. -->
       <!-- upper decorative magazine elements -->
-      <!-- Reason: These are only visual decorations for the top empty area. -->
-      <!-- upper decorative magazine elements -->
-      <!-- Reason: keep fewer decorations so the header and upload button stay as the focus. -->
+      <!-- keep fewer decorations so the header and upload button stay as the focus. -->
       <div class="upper-deco-layer" aria-hidden="true">
         <div class="big-bg-word word-tokyo">TOKYO</div>
         <div class="big-bg-word word-girl">GIRL</div>
+        <!-- The inclusion of Japanese text serves the same purpose as above — acting as a decorative element while further reinforcing the Japanese-inspired visual style.-->
 
         <div class="upper-note note-kawaii">かわいく加工しよう！</div>
+        <!-- Magazine-style corner labels-->
 
         <div class="mini-label label-vol">VOL.05</div>
         <div class="mini-label label-girly">girly mix</div>
@@ -65,8 +69,10 @@
         <div class="deco-tape tape-left">special<br />edition ♥</div>
         <div class="deco-heart">kira<br />kira ☆</div>
         <div class="deco-issue">'98<br />ISSUE<br /><strong>05</strong></div>
-        <img src="images/star-doodle.png" class="header-star" />
+        <img src="images/star-doodle.png" class="header-star" alt="" />
         <div class="deco-star star-two">✦</div>
+
+        <!--The addition of heart symbols helps reinforce the cute and playful tone expressed by the text.-->
         <div class="deco-note note-one">scroll<br />down! ♡</div>
         <div class="deco-note note-two">
           adjust<br />and create<br />your mood!
@@ -81,18 +87,20 @@
       <!-- upload button here -->
       <label for="upload" class="upload-btn">UPLOAD IMAGE❤</label>
       <input type="file" id="upload" accept="image/*" hidden />
-      <!-- 加入引导 -->
+
       <!-- hint for navigation -->
       <div class="hint">
         <p>Click "Upload Image" to start</p>
         <small>Then drag, resize, and edit your image</small>
       </div>
+      <!-- An arrow hover animation was added to create movement and visually guide the user’s attention toward the canvas.-->
       <div class="scroll-arrow">
         <span>⇣</span>
         <small>SCROLL TO EDIT</small>
       </div>
       <!-- put the menu bar here -->
       <!-- editor layout: left tools / center canvas / right adjustment panels -->
+      <!-- This layout was designed to ensure that all editing function buttons remain visible within the same screen as the canvas, allowing users to access tools more conveniently at any time. -->
       <section class="editor-layout">
         <!-- left magazine-style filter card -->
         <aside class="filter-card">
@@ -131,6 +139,7 @@
         </section>
 
         <!-- right adjustment and sticker archive -->
+        <!--The design of the brightness and contrast section was inspired by the subtitles and small overview text commonly found on magazine covers. -->
         <aside class="right-panel">
           <div class="slider-cluster">
             <label class="slider-card brightness-card">
@@ -224,6 +233,7 @@
       </section>
 
       <div class="download-area">
+        <!-- hint for navigation -->
         <p>When you finish editing, download your image below</p>
         <button id="downloadBtn">DOWNLOAD IMAGE❤</button>
       </div>

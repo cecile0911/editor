@@ -1,4 +1,19 @@
 let introModal = document.getElementById("introDialog");
+/* ==============================
+   GLOBAL UI SOUND
+================================= */
+// A camera shutter sound effect was used to enhance the sense of interaction and make the editing experience feel more engaging.
+
+const clickSound = new Audio("music/click.mp3");
+
+/* softer volume fits dreamy magazine style */
+clickSound.volume = 0.22;
+
+/* reusable function */
+function playClickSound() {
+  clickSound.currentTime = 0;
+  clickSound.play();
+}
 let undoStack = [];
 
 document.getElementById("introDialog").showModal();
@@ -9,7 +24,7 @@ document.getElementById("dialogCloseButton").addEventListener("click", () => {
 
 // create stage
 const stageWidth = Math.min(window.innerWidth * 0.7, 760);
-const stageHeight = 560;
+const stageHeight = 640;
 
 var stage = new Konva.Stage({
   container: "stageContainer",
@@ -62,7 +77,7 @@ document.getElementById("upload").addEventListener("change", function (e) {
       });
 
       const maxWidth = 620;
-      const maxHeight = 480;
+      const maxHeight = 560;
       const scale = Math.min(maxWidth / img.width, maxHeight / img.height, 1);
 
       konvaImage.width(img.width * scale);
@@ -72,7 +87,7 @@ document.getElementById("upload").addEventListener("change", function (e) {
       konvaImage.cache();
 
       selectNode(konvaImage);
-      // 确保图片被添加进konva再滚动
+      // This ensures that the image is fully added into Konva before the page scrolls downward.
       setTimeout(() => {
         document.getElementById("stageContainer").scrollIntoView({
           behavior: "smooth",
@@ -372,4 +387,18 @@ clearCanvasBtn.addEventListener("click", () => {
 
   // redraw
   layer.draw();
+});
+/* ==============================
+   APPLY SOUND TO ALL BUTTONS
+================================= */
+
+document.querySelectorAll("button").forEach((button) => {
+  button.addEventListener("click", () => {
+    playClickSound();
+  });
+});
+
+/* upload is a label, not a real button */
+document.querySelector(".upload-btn").addEventListener("click", () => {
+  playClickSound();
 });

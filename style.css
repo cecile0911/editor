@@ -1,11 +1,151 @@
+/* ==========================================================================
+   IMAGE EDITOR — TOKYO 1998 girly-mix magazine style
+
+   What changed in this version (and why)
+   1. Decorations no longer use fixed pixel "top" values on the whole page.
+      They are now pinned to the thing they belong to (title, side gutters of
+      the hero, filter card, canvas, sticker panel, download button), so they
+      cannot drift onto the controls on a different screen size.
+   2. The editor uses named grid areas with three breakpoints instead of
+      fixed column widths (the old layout needed 1230px+ and was cut off on
+      smaller laptops).
+   3. Web fonts + safe fallbacks (old stack relied on Arial Narrow / Hiragino,
+      which many computers do not have).
+   4. Risky effects removed: backdrop-filter on the canvas, background-attachment
+      fixed, mask-composite, glyph arrow, box-shadow on clipped elements.
+   5. Text sizes and colour contrast raised, focus states added.
+   ========================================================================== */
+
+/* ==============================
+   DESIGN TOKENS
+================================= */
+:root {
+  /* palette: 90s Japanese fashion-magazine covers (pink / purple base,
+     yellow + mint as contrasting accents) */
+  --pink-base: #efabc5;
+  --pink-soft: #f49fbe;
+  --hot: #d6336a; /* buttons with white text (4.6:1) */
+  --hot-light: #e05b7e; /* shadows / accents only */
+  --rose: #ab2863;
+  --plum: #8f3e67;
+  --plum-deep: #501c3a;
+  --ink: #3c202d;
+  --cream: #f8e2ae;
+  --paper: #fff4f8;
+  --mint: #aed4a2;
+  --teal: #5bb8ac;
+  --sky: #91b7d2;
+
+  --shadow-color: rgba(176, 88, 128, 0.3);
+  --sh-sm: 4px 4px 0 var(--shadow-color);
+  --sh-md: 7px 7px 0 var(--shadow-color);
+  --sh-lg: 11px 11px 0 rgba(176, 88, 128, 0.26);
+
+  --font-serif: "Playfair Display", "Iowan Old Style", "Palatino Linotype",
+    Georgia, "Times New Roman", serif;
+  --font-sans: "Barlow Condensed", "Arial Narrow", "Helvetica Neue", Arial,
+    "Noto Sans", sans-serif;
+  --font-jp: "Zen Maru Gothic", "Hiragino Maru Gothic ProN",
+    "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", "IPAGothic",
+    "Noto Sans CJK JP", sans-serif;
+
+  --gutter: clamp(16px, 3vw, 32px);
+
+  /* washi-tape fill used on tape pieces */
+  --tape: repeating-linear-gradient(
+      -45deg,
+      rgba(224, 91, 126, 0.16) 0 6px,
+      rgba(255, 255, 255, 0) 6px 12px
+    ),
+    rgba(248, 226, 174, 0.92);
+}
+
+/* ==============================
+   BASE
+================================= */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
 body {
   min-height: 100vh;
+  min-height: 100dvh;
   margin: 0;
+  padding: 56px var(--gutter) 0;
+
   position: relative;
-  overflow-x: hidden;
+  isolation: isolate;
+  /* "clip" instead of "hidden": nothing can scroll sideways, and it does not
+     turn the body into a scroll container */
+  overflow-x: clip;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  background-color: var(--pink-base);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.svg-defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 3px solid var(--ink);
+  outline-offset: 3px;
+}
+
+/* ==============================
+   BACKGROUND
+   I wanted a collage magazine-style effect, so the background uses
+   overlapping coloured bands at different angles, now with a light paper grain
+   and a halftone corner. The layers are fixed-position pseudo elements
+   (instead of background-attachment: fixed, which scrolls badly on many
+   laptops and is ignored on iOS).
+================================= */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
 
   background:
-  /* dusty rose top block */
+    /* paper grain */
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .56 0 0 0 0 .24 0 0 0 0 .4 0 0 0 .5 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.22'/%3E%3C/svg%3E"),
+    /* dusty rose top block */
     linear-gradient(168deg, rgba(176, 88, 128, 0.58) 0 15%, transparent 15%),
     /* soft pink paper strip */
     linear-gradient(
@@ -37,850 +177,1777 @@ body {
         rgba(145, 183, 210, 0.24) 72% 82%,
         transparent 82%
       ),
-    #efabc5;
+    var(--pink-base);
+}
 
-  background-attachment: fixed;
+/* halftone dots fading in from the top-right corner */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+
+  background: radial-gradient(
+      circle,
+      rgba(171, 40, 99, 0.3) 0 1.5px,
+      transparent 2px
+    )
+    0 0 / 10px 10px;
+
+  -webkit-mask-image: radial-gradient(
+    circle at 100% 0,
+    #000 0,
+    transparent 38%
+  );
+  mask-image: radial-gradient(circle at 100% 0, #000 0, transparent 38%);
+}
+
+/* ==============================
+   MASTHEAD (title)
+   The rotated angle imitates magazine headlines. All masthead decorations
+   are children of the header, so they stay attached to the title.
+================================= */
+header {
+  position: relative;
+  z-index: 30;
+  max-width: 100%;
+  /* room below for the heart badge that hangs off the title */
+  margin: 8px 0 4.2rem;
+  transform: rotate(-4deg);
+}
+
+header h1 {
+  margin: 0;
+
+  font-family: var(--font-serif);
+  font-size: clamp(2.5rem, 10.5vw, 6rem);
+  font-style: italic;
+  font-weight: 800;
+  font-synthesis: none;
+  line-height: 1;
+  letter-spacing: -0.045em;
+
+  /* the shadow sits here, the clip-path sits on the plate inside */
+  filter: drop-shadow(10px 10px 0 rgba(224, 91, 126, 0.42))
+    drop-shadow(-7px -5px 0 rgba(248, 226, 174, 0.4));
+}
+
+.title-plate {
+  display: block;
+  padding: 0.27em 0.9em 0.3em;
+
+  color: #fff7fb;
+  /* saturation kept high so the heading never melts into the pink background */
+  background: var(--rose);
+  clip-path: polygon(4% 0, 100% 0, 96% 100%, 0 100%);
+
+  text-shadow:
+    0.03em 0.03em 0 rgba(224, 91, 126, 0.85),
+    0.06em 0.06em 0 rgba(255, 255, 255, 0.2);
+}
+
+/* Katakana subtitle. Deliberately not centred, for a slight sense of
+   irregularity and freedom. */
+.title-plate::after {
+  content: "イメージエディター  /  TOKYO 1998";
+
+  display: block;
+  margin: 0.14em 0 0 0.2em;
+
+  font-family: var(--font-jp);
+  font-size: max(0.72rem, 0.15em);
+  font-style: normal;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: 0.34em;
+
+  color: #ffe8f3;
+  text-shadow: none;
+}
+
+/* ---- decorations pinned to the title ---- */
+.masthead-deco {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* tape and badges are wrapped in an outer element that carries the shadow:
+   box-shadow / drop-shadow on an element with its own clip-path is cut off */
+.deco-tape,
+.deco-heart,
+.deco-label,
+.canvas-sticker-label {
+  filter: drop-shadow(3px 3px 0 rgba(176, 88, 128, 0.3));
+}
+
+.deco-tape {
+  position: absolute;
+  z-index: 2;
+}
+
+.deco-tape span {
+  display: block;
+  padding: 0.5rem 1.8rem;
+
+  background: var(--tape);
+  color: var(--plum);
+
+  font-family: var(--font-serif);
+  font-size: 1.05rem;
+  font-style: italic;
+  font-weight: 700;
+  line-height: 1.1;
+  text-align: center;
+
+  /* zig-zag cut ends, like torn washi tape */
+  clip-path: polygon(
+    0 0,
+    100% 0,
+    98% 20%,
+    100% 40%,
+    98% 60%,
+    100% 80%,
+    98% 100%,
+    0 100%,
+    2% 80%,
+    0 60%,
+    2% 40%,
+    0 20%
+  );
+}
+
+.tape-left {
+  top: -0.6rem;
+  left: -1.8rem;
+  transform: rotate(-24deg);
+}
+
+.deco-issue {
+  position: absolute;
+  top: -1.5rem;
+  right: -1.8rem;
+
+  padding: 0.55rem 0.9rem 0.6rem;
+
+  background: var(--paper);
+  color: var(--ink);
+  border: 2px dotted rgba(143, 62, 103, 0.55);
+  box-shadow: var(--sh-sm);
+
+  font-family: var(--font-serif);
+  font-size: 0.95rem;
+  line-height: 1.1;
+  text-align: center;
+
+  transform: rotate(8deg);
+}
+
+.deco-issue strong {
+  display: block;
+  font-size: 2.1rem;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--plum);
+}
+
+.deco-heart {
+  position: absolute;
+  right: 6%;
+  bottom: -3.5rem;
+
+  width: 5.6rem;
+  height: 5.2rem;
+
+  transform: rotate(12deg);
+}
+
+.deco-heart span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  height: 100%;
+  padding-bottom: 0.35rem;
+
+  background: var(--hot);
+  color: #fff;
+  clip-path: url(#clipHeart);
+
+  font-family: var(--font-serif);
+  font-size: 0.9rem;
+  font-style: italic;
+  font-weight: 700;
+  line-height: 1.1;
+  text-align: center;
+}
+
+/* ==============================
+   MAIN + HERO
+   Three-column grid: left gutter | core | right gutter.
+   The core (upload button, hint, arrow) is a real grid cell, so the
+   decorations in the gutters can never sit on top of it.
+================================= */
+#wrapper {
+  width: 100%;
 
   display: flex;
   flex-direction: column;
   align-items: center;
-
-  font-family: Arial, sans-serif;
-  padding-top: 30px;
-}
-button,
-.upload-btn,
-.sticker-btn {
-  font-family: "Arial Narrow", Arial, Helvetica, sans-serif;
 }
 
-.slider-note,
-.hint,
-.download-area p,
-.sticker-title {
-  font-family: Arial, Helvetica, sans-serif;
-}
-header {
-  margin-bottom: 8px;
-  transform: rotate(-4deg);
+.hero {
   position: relative;
-  z-index: 30;
-}
-/* image editor */
-header h1 {
-  position: relative;
-  margin: 0;
+  width: min(1280px, 100%);
 
-  font-family: "Times New Roman", Georgia, serif;
-  font-size: 96px;
-  font-style: italic;
-  font-weight: 700;
-
-  color: #fff7fb;
-
-  background: rgba(176, 88, 128, 0.78);
-
-  padding: 26px 90px 30px;
-
-  letter-spacing: -5px;
-  line-height: 1;
-
-  clip-path: polygon(4% 0, 100% 0, 96% 100%, 0 100%);
-
-  box-shadow:
-    12px 12px 0 rgba(224, 91, 126, 0.42),
-    -8px -6px 0 rgba(248, 226, 174, 0.35);
-
-  text-shadow:
-    3px 3px 0 rgba(224, 91, 126, 0.85),
-    6px 6px 0 rgba(255, 255, 255, 0.2);
-}
-
-header h1::after {
-  content: "イメージエディター  /  TOKYO 1998";
-
-  display: block;
-
-  margin-top: 12px;
-  margin-left: 18px;
-
-  font-family: "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
-  font-size: 14px;
-  font-style: normal;
-  font-weight: 900;
-
-  color: #ffe8f3;
-
-  letter-spacing: 6px;
-  line-height: 1;
-
-  text-shadow: none;
-}
-/* main */
-/* ==============================
-   EDITOR LAYOUT
-   Reason:
-   Turn the page from a vertical poster into a usable editor:
-   controls stay on the left, canvas stays visible on the right.
-================================= */
-
-#wrapper {
-  width: min(1500px, 94vw);
-
-  margin-top: 28px;
-  margin-bottom: 60px;
-
-  position: relative;
-  z-index: 10;
-}
-
-.editor-layout {
   display: grid;
-  grid-template-columns: 360px 1fr;
-  gap: 34px;
-
-  align-items: start;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 520px) minmax(0, 1fr);
+  align-items: stretch;
 }
 
-/* Left-side control area */
-.control-panel {
-  position: sticky;
-  top: 24px;
+/* all three cells share row 1 (without this the core wrapped to a second row) */
+.hero-core,
+.hero-side {
+  grid-row: 1;
+}
+
+.hero-core {
+  grid-column: 2;
+  position: relative;
+  z-index: 2;
 
   display: flex;
   flex-direction: column;
-  gap: 20px;
-
-  padding: 18px;
-
-  background: rgba(255, 230, 238, 0.28);
-
-  box-shadow: 12px 12px 0 rgba(176, 88, 128, 0.12);
+  align-items: center;
+  gap: 16px;
 }
 
-/* Small section label */
-.panel-label {
-  margin: 0 0 12px 0;
+.hero-side {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+  min-height: 330px;
+  padding: 0.5rem 1.5rem;
 
-  font-family: "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
-  font-size: 10px;
-  font-weight: 900;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 1rem;
 
-  letter-spacing: 5px;
-
-  color: rgba(35, 20, 25, 0.8);
+  pointer-events: none;
 }
 
-/* Upload becomes part of the left panel */
+.hero-side--left {
+  grid-column: 1;
+  align-items: flex-start;
+}
+
+.hero-side--right {
+  grid-column: 3;
+  align-items: flex-end;
+}
+
+/* ---- upload / download buttons (paper-label feeling) ---- */
 .upload-btn,
 #downloadBtn {
+  position: relative;
   display: inline-block;
 
-  background: rgba(248, 226, 174, 0.92);
-  color: #8f3e67;
+  padding: 0.7em 2.1em;
 
+  background: var(--cream);
+  color: var(--plum);
   border: none;
 
-  padding: 14px 28px;
-
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 20px;
+  font-family: var(--font-serif);
+  font-size: clamp(1.25rem, 3.4vw, 1.6rem);
   font-style: italic;
   font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: 0.02em;
 
-  letter-spacing: 0.5px;
-
-  box-shadow: 8px 8px 0 rgba(224, 91, 126, 0.16);
-
-  transform: rotate(-1deg);
-
+  box-shadow: var(--sh-md);
+  transform: rotate(-1.5deg);
   cursor: pointer;
-  transition: 0.15s ease;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    background-color 0.15s ease;
+}
+
+/* dashed "cut here" line inside the label */
+.upload-btn::before,
+#downloadBtn::before {
+  content: "";
+  position: absolute;
+  inset: 6px;
+  border: 2px dashed rgba(143, 62, 103, 0.45);
+  pointer-events: none;
 }
 
 .upload-btn:hover,
 #downloadBtn:hover {
-  opacity: 0.92;
-  transform: translateY(-2px) rotate(-1deg);
+  background: #fffaf0;
+  transform: translate(-2px, -3px) rotate(-1.5deg);
+  box-shadow: 10px 11px 0 var(--shadow-color);
 }
 
-/* ==============================
-   FILTER BUTTONS
-================================= */
-
-.filter-cluster {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 14px;
+.upload-btn:active,
+#downloadBtn:active {
+  transform: translate(3px, 3px) rotate(-1.5deg);
+  box-shadow: 2px 2px 0 var(--shadow-color);
 }
 
-.filter-cluster .panel-label {
-  grid-column: 1 / -1;
-}
-
-.filter-cluster button {
-  border: none;
-
-  color: white;
-
-  padding: 12px 14px;
-
-  font-family: "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
-  font-size: 13px;
-  font-weight: 900;
-
-  letter-spacing: 1.6px;
-  text-transform: uppercase;
-
-  box-shadow: 6px 6px 0 rgba(176, 88, 128, 0.18);
-
-  cursor: pointer;
-}
-
-#grayBtn {
-  background: rgba(224, 91, 126, 0.92);
-  transform: rotate(-4deg);
-}
-
-#invertBtn {
-  background: rgba(111, 190, 177, 0.88);
-  transform: rotate(3deg);
-}
-
-#sepiaBtn {
-  background: rgba(176, 88, 128, 0.86);
-  transform: rotate(4deg);
-}
-
-#resetFilterBtn {
-  background: rgba(248, 226, 174, 0.95);
-  color: #8f3e67;
-  transform: rotate(-2deg);
-}
-
-/* ==============================
-   STICKER PANEL - SIDEBAR VERSION
-================================= */
-
-.sticker-panel {
-  position: relative;
-  z-index: 25;
-
-  width: auto;
-  max-width: none;
-
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-
-  margin: 0;
-
-  padding: 16px;
-
-  background: rgba(255, 230, 238, 0.38);
-
-  box-shadow: 8px 8px 0 rgba(176, 88, 128, 0.14);
-
-  transform: rotate(-1deg);
-}
-
-.sticker-row,
-.sticker-style,
-.sticker-actions {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  flex-wrap: wrap;
-}
-
-.sticker-title,
-.sticker-style span {
-  width: 100%;
-
-  margin-right: 0;
-
-  font-family: "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
-  font-size: 10px;
-  font-weight: 700;
-
-  letter-spacing: 4px;
-
-  color: rgba(35, 20, 25, 0.82);
-}
-
-.sticker-btn,
-.style-btn,
-#deleteStickerBtn,
-#undoBtn {
-  border: none;
-
-  padding: 6px 10px;
-
-  cursor: pointer;
-
-  box-shadow: 5px 5px 0 rgba(224, 91, 126, 0.16);
-
-  transition: 0.15s ease;
-}
-
-.sticker-btn {
-  background: rgba(248, 226, 174, 0.82);
-
-  color: #8f3e67;
-
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 16px;
-  font-style: italic;
-  font-weight: 700;
-
-  transform: rotate(-2deg);
-}
-
-.sticker-btn:nth-child(odd) {
-  background: rgba(174, 212, 162, 0.62);
-  transform: rotate(2deg);
-}
-
-.sticker-btn[data-sticker="カワイイ"] {
-  font-family: "Hiragino Maru Gothic Pro", "Yu Gothic", sans-serif;
-  font-size: 14px;
-  font-style: normal;
-  font-weight: 700;
-
-  letter-spacing: 1px;
-}
-
-.style-btn {
-  background: rgba(248, 226, 174, 0.82);
-  color: #8f3e67;
-
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 13px;
-  font-style: italic;
-  font-weight: 700;
-}
-
-.style-btn.active {
-  background: rgba(224, 91, 126, 0.86);
-  color: white;
-}
-
-#deleteStickerBtn,
-#undoBtn {
-  font-family: "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
-  font-size: 10px;
-  font-style: normal;
-  font-weight: 900;
-
-  letter-spacing: 1.5px;
-}
-
-#deleteStickerBtn {
-  background: rgba(176, 88, 128, 0.8);
-  color: white;
-}
-
-#undoBtn {
-  background: rgba(111, 190, 177, 0.72);
-  color: #3c202d;
-}
-
-/* ==============================
-   SIDE PANEL SLIDERS
-   Reason:
-   Smaller slider cards fit inside the left editor panel
-   while keeping the Japanese magazine style.
-================================= */
-
-.slider-block {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.slider-card {
-  position: relative;
-
-  width: 100%;
-
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-
-  color: #3c202d;
-}
-
-.slider-heading {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-
-  background: rgba(255, 244, 248, 0.76);
-
-  padding: 9px 14px 10px;
-
-  box-shadow: 6px 6px 0 rgba(224, 91, 126, 0.14);
-}
-
-.slider-title {
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 30px;
-  font-style: italic;
-  font-weight: 700;
-
-  line-height: 0.9;
-  letter-spacing: -1px;
-
-  color: #9b4470;
-}
-
-.slider-jp {
-  font-family: "Hiragino Kaku Gothic Pro", "Yu Gothic", Arial, sans-serif;
-  font-size: 11px;
-  font-weight: 900;
-
-  line-height: 1.3;
-  letter-spacing: 1px;
-
-  color: #9b4470;
-}
-
-.slider-jp-note {
-  margin: 12px 0 6px 4px;
-
-  font-family: "Hiragino Kaku Gothic Pro", "Yu Gothic", Arial, sans-serif;
-  font-size: 11px;
-  font-weight: 800;
-
-  letter-spacing: 0.5px;
-  line-height: 1.45;
-
-  color: rgba(35, 20, 25, 0.9);
-}
-
-.slider-note {
-  width: 300px;
-
-  margin: 0 0 12px 4px;
-
-  font-family: "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
-  font-size: 10px;
-  line-height: 1.45;
-  font-weight: 900;
-
-  letter-spacing: 0.8px;
-
-  color: rgba(35, 20, 25, 0.9);
-
-  text-transform: uppercase;
-}
-
-.slider-card input[type="range"] {
-  width: 300px;
-
-  margin-left: 4px;
-
-  accent-color: #e05b7e;
-}
-
-/* ==============================
-   CANVAS WORKSPACE
-================================= */
-
-.canvas-area {
-  min-width: 0;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+#upload:focus-visible + .upload-btn,
+#downloadBtn:focus-visible {
+  outline: 3px solid var(--ink);
+  outline-offset: 5px;
 }
 
 .hint {
   text-align: center;
-  color: rgba(95, 80, 90, 0.75);
-  font-weight: bold;
-  letter-spacing: 0.5px;
+  color: var(--ink);
+  text-wrap: balance;
+}
 
-  margin-top: 0;
-  margin-bottom: 16px;
-
-  position: relative;
-  z-index: 30;
+.hint p {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
 }
 
 .hint small {
-  font-size: 12px;
-  color: rgba(80, 80, 80, 0.58);
+  display: block;
+  margin-top: 2px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  /* was #aaa, which was hard to read on pink */
+  color: var(--plum-deep);
 }
 
-/* Smaller canvas so it appears in the first screen */
-#stageContainer {
-  width: 960px;
-  height: 620px;
-
-  max-width: 100%;
-
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.18),
-    rgba(255, 255, 255, 0.04)
-  );
-
-  border: 2px solid rgba(255, 255, 255, 0.42);
-
-  border-radius: 24px;
-
-  backdrop-filter: blur(6px);
-
-  box-shadow:
-    0 24px 50px rgba(0, 0, 0, 0.12),
-    inset 0 0 40px rgba(255, 255, 255, 0.06);
-
-  overflow: hidden;
-
+/* ---- scroll arrow: drawn with SVG (the old "⇣" glyph is missing from many
+   fonts and showed up as an empty box on some computers) ---- */
+.scroll-arrow {
   position: relative;
-}
-
-.download-area {
-  text-align: center;
-
   margin-top: 22px;
-  margin-bottom: 40px;
 
-  color: rgba(95, 80, 90, 0.75);
-  font-weight: bold;
-  letter-spacing: 0.5px;
+  text-align: center;
+  color: var(--plum-deep);
 
-  position: relative;
-  z-index: 30;
+  animation: floatArrow 1.6s ease-in-out infinite;
+  pointer-events: none;
 }
 
-.download-area p {
-  margin-bottom: 12px;
+.arrow-icon {
+  display: block;
 }
 
-/* TOOLBAR: separates filter buttons and slider area */
-
-.filter-cluster button {
-  position: absolute;
-
-  border: none;
-  color: white;
-
-  padding: 11px 26px;
-
-  font-family: "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
-  font-size: 14px;
-  font-weight: 900;
-
-  letter-spacing: 2px;
-  text-transform: uppercase;
-
-  box-shadow: 10px 10px 0 rgba(176, 88, 128, 0.18);
-
-  cursor: pointer;
+.arrow-icon svg {
+  display: block;
+  width: clamp(46px, 7vw, 64px);
+  height: auto;
+  margin: 0 auto;
+  overflow: visible;
 }
 
-.slider-heading {
-  display: flex;
-  align-items: center;
-  gap: 28px;
-
-  background: rgba(255, 244, 248, 0.76);
-
-  padding: 9px 18px 10px;
-
-  box-shadow: 10px 10px 0 rgba(224, 91, 126, 0.14);
+.arrow-icon path {
+  fill: none;
+  stroke-width: 6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
-.slider-title {
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 34px;
-  font-style: italic;
-  font-weight: 700;
-
-  line-height: 0.9;
-  letter-spacing: -2px;
-
-  color: #9b4470;
+.arrow-main path {
+  stroke: var(--plum);
 }
 
-.slider-jp {
-  font-family: "Hiragino Kaku Gothic Pro", "Yu Gothic", Arial, sans-serif;
-  font-size: 14px;
-  font-weight: 900;
-
-  line-height: 1.3;
-  letter-spacing: 2px;
-
-  color: #9b4470;
+.arrow-shadow path {
+  stroke: rgba(224, 91, 126, 0.4);
 }
 
-.slider-jp-note {
-  margin: 12px 0 6px 8px;
+/* dotted stem */
+.arrow-icon path:first-child {
+  stroke-width: 7;
+  stroke-dasharray: 0.01 13;
+}
 
-  font-family: "Hiragino Kaku Gothic Pro", "Yu Gothic", Arial, sans-serif;
-  font-size: 12px;
+.scroll-arrow small {
+  display: block;
+  margin-top: 8px;
+
+  font-size: 0.8125rem;
   font-weight: 800;
-
-  letter-spacing: 1px;
-  line-height: 1.5;
-
-  color: rgba(35, 20, 25, 0.9);
+  letter-spacing: 0.3em;
+  text-indent: 0.3em;
 }
 
-.slider-note {
-  width: 380px;
-
-  margin: 0 0 24px 8px;
-
-  font-family: "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
-  font-size: 12px;
-  line-height: 1.45;
-  font-weight: 900;
-
-  letter-spacing: 1px;
-
-  color: rgba(35, 20, 25, 0.9);
-
-  text-transform: uppercase;
-}
-
-.slider-card input[type="range"] {
-  width: 340px;
-
-  margin-left: 8px;
-
-  accent-color: #e05b7e;
-}
-
-header,
-#wrapper {
-  position: relative;
-  z-index: 10;
-}
-
-.upload-btn,
-.toolbar {
-  position: relative;
-  z-index: 20;
+@keyframes floatArrow {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(8px);
+  }
 }
 
 /* ==============================
-   STICKER PANEL
-   Reason:
-   Make this area feel like a 90s Japanese magazine material box,
-   not a normal website toolbar.
+   HERO DECORATIONS (side gutters)
 ================================= */
 
-.sticker-panel {
-  position: relative;
-  z-index: 25;
+/* large outlined magazine words, sized from the width left over beside the
+   core column so they fit in the gutter at every screen size */
+.big-bg-word {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 0;
 
-  width: fit-content;
-  max-width: 1000px;
+  font-family: var(--font-serif);
+  font-size: clamp(3rem, calc((100vw - 520px) / 6.4), 8rem);
+  font-style: italic;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.05em;
+  white-space: nowrap;
+
+  color: rgba(255, 255, 255, 0.16);
+  -webkit-text-stroke: 2px rgba(255, 255, 255, 0.7);
+  text-shadow: 6px 6px 0 rgba(224, 91, 126, 0.16);
+
+  user-select: none;
+}
+
+.word-tokyo {
+  transform: translate(-50%, -50%) rotate(-8deg);
+}
+
+.word-girl {
+  transform: translate(-50%, -50%) rotate(8deg);
+}
+
+.mini-label,
+.upper-note,
+.deco-note,
+.dotted-line,
+.header-star {
+  position: relative;
+  z-index: 1;
+}
+
+/* small paper labels */
+.mini-label {
+  padding: 0.4rem 1rem;
+
+  background: var(--cream);
+  color: var(--plum);
+  box-shadow: 5px 5px 0 rgba(224, 91, 126, 0.22);
+
+  font-family: var(--font-serif);
+  font-size: 1.1rem;
+  font-style: italic;
+  font-weight: 700;
+}
+
+.label-vol {
+  transform: rotate(6deg);
+}
+
+.label-girly {
+  background: var(--mint);
+  color: var(--ink);
+  transform: rotate(-7deg);
+}
+
+/* handwritten-style notes */
+.upper-note,
+.deco-note {
+  color: var(--plum-deep);
+  font-family: var(--font-serif);
+  font-size: 1.15rem;
+  font-style: italic;
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+.note-kawaii {
+  padding: 0.35rem 0.9rem;
+
+  background: rgba(255, 244, 248, 0.82);
+  border-radius: 999px;
+  box-shadow: 4px 4px 0 rgba(224, 91, 126, 0.2);
+
+  font-family: var(--font-jp);
+  font-size: 1rem;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 1.3;
+
+  transform: rotate(4deg);
+}
+
+.note-two {
+  transform: rotate(-8deg);
+}
+
+/* the "scroll down!" note rides on the arrow and floats with it */
+.note-one {
+  position: absolute;
+  top: 14px;
+  left: calc(50% + 46px);
+
+  width: max-content;
+  text-align: left;
+  transform: rotate(-12deg);
+}
+
+/* dotted line made with CSS (the old row of "・" characters depends on a
+   Japanese font being installed) */
+.dotted-line {
+  width: 9rem;
+  height: 10px;
+
+  background: radial-gradient(
+      circle,
+      rgba(143, 62, 103, 0.7) 0 2.2px,
+      transparent 2.8px
+    )
+    0 50% / 15px 10px repeat-x;
+
+  transform: rotate(-4deg);
+}
+
+.header-star {
+  /* pinned to the top-left of the right gutter, away from the GIRL watermark */
+  position: absolute;
+  top: 4.6rem;
+  left: 1.2rem;
+  width: clamp(64px, 8vw, 130px);
+  height: auto;
+
+  opacity: 0.85;
+  transform: rotate(-12deg);
+  mix-blend-mode: multiply;
+}
+
+/* ==============================
+   MAIN EDITOR LAYOUT
+   Named grid areas. Mobile: canvas, filters, tools stacked.
+   760px+: canvas on top, filters and tools side by side.
+   1360px+: classic 3 columns (filters | canvas | tools).
+================================= */
+.editor-layout {
+  position: relative;
+  z-index: 20;
+  width: min(1400px, 100%);
+
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas:
+    "canvas"
+    "filter"
+    "tools";
+  gap: clamp(36px, 5vw, 48px) clamp(24px, 3vw, 40px);
+  align-items: start;
+
+  margin-top: clamp(28px, 5vw, 44px);
+  margin-bottom: clamp(28px, 4vw, 44px);
+}
+
+.left-col {
+  grid-area: filter;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  min-width: 0;
+}
+
+.canvas-zone {
+  grid-area: canvas;
+  width: 100%;
+  max-width: 760px;
+  min-width: 0;
+  justify-self: center;
 
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  align-items: center;
+}
 
-  margin-top: -80px;
-  margin-bottom: 8px;
+.right-panel {
+  grid-area: tools;
+  min-width: 0;
 
-  padding: 20px 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
 
-  background: rgba(255, 230, 238, 0.38);
+@media (min-width: 760px) {
+  .editor-layout {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-areas:
+      "canvas canvas"
+      "filter tools";
+  }
+}
 
-  box-shadow: 12px 12px 0 rgba(176, 88, 128, 0.14);
-
-  transform: rotate(-1deg);
-
-  /* Reason:
-     This keeps the panel slightly like a paper collage piece. */
+@media (min-width: 1360px) {
+  .editor-layout {
+    grid-template-columns: 240px minmax(0, 1fr) 320px;
+    grid-template-areas: "filter canvas tools";
+  }
 }
 
 /* ==============================
-   ROW LAYOUT
+   PAPER CARDS (filter card, sliders, sticker archive)
+   Semi-opaque paper so text stays readable on any part of the collage,
+   a dashed print line inside, and a tape piece holding it down.
 ================================= */
+.filter-card,
+.sticker-panel,
+.slider-card {
+  position: relative;
 
-.sticker-row,
-.sticker-style,
-.sticker-actions {
+  background: rgba(255, 244, 248, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+}
+
+.filter-card::after,
+.sticker-panel::after,
+.slider-card::after {
+  content: "";
+  position: absolute;
+  inset: 7px;
+  border: 1.5px dashed rgba(143, 62, 103, 0.28);
+  pointer-events: none;
+}
+
+/* washi tape holding the card */
+.filter-card::before,
+.sticker-panel::before {
+  content: "";
+  position: absolute;
+  top: -13px;
+  left: 50%;
+  z-index: 2;
+
+  width: 96px;
+  height: 26px;
+
+  background: var(--tape);
+  clip-path: polygon(
+    0 0,
+    100% 0,
+    97% 25%,
+    100% 50%,
+    97% 75%,
+    100% 100%,
+    0 100%,
+    3% 75%,
+    0 50%,
+    3% 25%
+  );
+  transform: translateX(-50%) rotate(-3deg);
+  pointer-events: none;
+}
+
+/* ==============================
+   LEFT FILTER CARD
+================================= */
+.filter-card {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0 1.5rem;
+
+  padding: 1.7rem 1.3rem 1rem;
+  box-shadow: var(--sh-lg);
+  transform: rotate(-1.5deg);
+}
+
+.filter-card h2,
+.filter-card > small {
+  grid-column: 1 / -1;
+}
+
+.filter-card h2 {
+  margin: 0;
+
+  font-family: var(--font-serif);
+  font-size: 1.6rem;
+  font-style: italic;
+  font-weight: 800;
+  line-height: 1.1;
+  color: var(--plum);
+}
+
+.filter-card > small {
+  display: block;
+  margin: 4px 0 1rem;
+
+  font-family: var(--font-jp);
+  font-size: 0.75rem;
+  font-weight: 900;
+  letter-spacing: 0.25em;
+  color: var(--plum-deep);
+}
+
+.filter-item {
+  padding: 0.2rem 0 0.9rem;
+  margin-bottom: 0.8rem;
+  border-bottom: 2px dotted rgba(143, 62, 103, 0.3);
+}
+
+.filter-item p {
+  margin: 8px 0 0;
+
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: 0.04em;
+  color: var(--ink);
+  text-transform: lowercase;
+}
+
+.filter-item button {
+  padding: 0.38rem 0.95rem;
+
+  border: none;
+  color: #fff;
+
+  font-family: var(--font-serif);
+  font-size: 1.05rem;
+  font-style: italic;
+  font-weight: 700;
+  line-height: 1.2;
+
+  box-shadow: var(--sh-sm);
+  cursor: pointer;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.filter-item button:hover {
+  transform: translate(-1px, -2px) rotate(-1.5deg);
+  box-shadow: 6px 7px 0 var(--shadow-color);
+}
+
+.filter-item button:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 var(--shadow-color);
+}
+
+/* The button colours continue the contrasting colour approach, also inspired
+   by the small subtitle elements on 90s Japanese magazine covers. */
+#grayBtn {
+  background: var(--hot);
+}
+
+#invertBtn {
+  background: var(--teal);
+  color: var(--ink);
+}
+
+#sepiaBtn {
+  background: #a64877;
+}
+
+#resetFilterBtn {
+  background: var(--cream);
+  color: var(--plum);
+}
+
+/* ---- decorations below the filter card (only on the 3-column layout) ---- */
+.left-col::after {
+  content: "soft film texture\A print-like shadow\A dreamy tone ♡";
+  white-space: pre-line;
+
+  align-self: center;
+  width: 190px;
+  padding: 1.1rem 1.2rem;
+
+  border: 1.5px solid rgba(60, 32, 45, 0.45);
+  border-radius: 50%;
+
+  color: var(--plum-deep);
+  font-family: var(--font-serif);
+  font-size: 0.95rem;
+  font-style: italic;
+  line-height: 1.35;
+  text-align: center;
+
+  transform: rotate(-6deg);
+}
+
+.deco-barcode {
+  align-self: flex-start;
+  margin-left: 0.8rem;
+  padding: 0.6rem 0.85rem;
+
+  background: rgba(255, 244, 248, 0.85);
+  color: var(--ink);
+  box-shadow: var(--sh-sm);
+
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+
+  transform: rotate(-5deg);
+}
+
+.deco-barcode div {
+  width: 110px;
+  height: 42px;
+  margin: 6px 0 3px;
+
+  background: repeating-linear-gradient(
+    90deg,
+    var(--ink) 0 2px,
+    transparent 2px 5px,
+    var(--ink) 5px 7px,
+    transparent 7px 10px
+  );
+}
+
+.deco-barcode small {
+  font-size: 0.7rem;
+  letter-spacing: 0.3em;
+}
+
+/* these two only have room beside the filter card on the 3-column layout */
+.deco-barcode,
+.left-col::after {
+  display: none;
+}
+
+@media (min-width: 1360px) {
+  .deco-barcode {
+    display: block;
+  }
+  .left-col::after {
+    display: block;
+  }
+}
+
+/* ==============================
+   CENTER CANVAS
+   The frame is a paper mat around the canvas with print crop marks.
+   #stageContainer itself has no border and no padding, so the Konva stage can
+   read its exact size.
+================================= */
+.canvas-frame {
+  position: relative;
+  width: 100%;
+  padding: 10px;
+
+  background: rgba(255, 244, 248, 0.92);
+  border-radius: 4px;
+  box-shadow: var(--sh-lg);
+}
+
+/* crop marks at the four corners */
+.canvas-frame::before {
+  content: "";
+  position: absolute;
+  inset: -15px;
+  pointer-events: none;
+
+  background:
+    linear-gradient(var(--plum), var(--plum)) left top / 15px 2px no-repeat,
+    linear-gradient(var(--plum), var(--plum)) left top / 2px 15px no-repeat,
+    linear-gradient(var(--plum), var(--plum)) right top / 15px 2px no-repeat,
+    linear-gradient(var(--plum), var(--plum)) right top / 2px 15px no-repeat,
+    linear-gradient(var(--plum), var(--plum)) left bottom / 15px 2px no-repeat,
+    linear-gradient(var(--plum), var(--plum)) left bottom / 2px 15px no-repeat,
+    linear-gradient(var(--plum), var(--plum)) right bottom / 15px 2px no-repeat,
+    linear-gradient(var(--plum), var(--plum)) right bottom / 2px 15px no-repeat;
+}
+
+/* The canvas is a soft grid-paper desk. The old translucent + blurred
+   background (backdrop-filter) is gone: it caused flicker and blank canvases
+   on some graphics drivers and in Safari. */
+#stageContainer {
+  position: relative;
+  width: 100%;
+  height: 640px;
+  overflow: hidden;
+
+  background-color: #fffafc;
+  background-image:
+    linear-gradient(rgba(224, 91, 126, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(224, 91, 126, 0.1) 1px, transparent 1px);
+  background-size: 28px 28px;
+  border-radius: 2px;
+}
+
+.canvas-sticker-label {
+  position: absolute;
+  top: -38px;
+  left: -18px;
+  z-index: 5;
+
+  width: 76px;
+  height: 76px;
+
+  transform: rotate(-14deg);
+  pointer-events: none;
+}
+
+.canvas-sticker-label span {
+  display: grid;
+  place-items: center;
+
+  width: 100%;
+  height: 100%;
+
+  background: var(--hot);
+  color: #fff;
+  clip-path: url(#clipBurst);
+
+  font-family: var(--font-serif);
+  font-size: 1.3rem;
+  font-style: italic;
+  font-weight: 800;
+}
+
+.canvas-note {
+  margin: 1.5rem 0 0;
+  padding: 0 0.5rem;
+
+  font-size: 0.875rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-align: center;
+  color: var(--plum-deep);
+}
+
+/* ==============================
+   RIGHT PANEL: sliders
+   The headings are magazine "headline stickers" that overlap the top edge of
+   each card. Brightness is light (cream), contrast is dark (plum).
+================================= */
+.slider-cluster {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.slider-card {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+
+  padding: 1.6rem 1.3rem 1.2rem;
+  margin-top: 16px;
+
+  box-shadow: var(--sh-md);
+  color: var(--ink);
+}
+
+.brightness-card {
+  transform: rotate(-1deg);
+}
+
+.contrast-card {
+  transform: rotate(1deg);
+}
+
+.slider-heading {
+  position: absolute;
+  top: -18px;
+  left: 14px;
+  z-index: 2;
+
   display: flex;
   align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
+  gap: 0.8rem;
+
+  padding: 0.3rem 0.9rem 0.35rem;
+
+  box-shadow: 5px 5px 0 rgba(224, 91, 126, 0.25);
+  transform: rotate(-2deg);
 }
 
-/* Reason:
-   Center action buttons so DELETE / UNDO feel like a small control area,
-   not part of the sticker list. */
-.sticker-actions {
-  justify-content: center;
+.brightness-card .slider-heading {
+  background: var(--cream);
+  color: var(--plum);
+}
+
+.contrast-card .slider-heading {
+  background: var(--plum-deep);
+  color: var(--cream);
+}
+
+.slider-title {
+  font-family: var(--font-serif);
+  font-size: 1.7rem;
+  font-style: italic;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+
+.slider-jp {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+
+  font-family: var(--font-jp);
+  font-size: 0.6875rem;
+  font-weight: 900;
+  line-height: 1.2;
+  letter-spacing: 0.1em;
+}
+
+/* a row of dots instead of "･････" characters */
+.slider-jp .dots {
+  display: block;
+  height: 5px;
+  background: radial-gradient(circle, currentColor 1.2px, transparent 1.7px) 0
+    50% / 7px 5px repeat-x;
+}
+
+.slider-jp-note {
+  margin: 0.5rem 0 0.2rem;
+
+  font-family: var(--font-jp);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  line-height: 1.6;
+  letter-spacing: 0.03em;
+}
+
+.slider-note {
+  margin: 0 0 0.5rem;
+
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.35;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(35, 20, 25, 0.88);
+}
+
+/* custom slider: ink-outlined pill track + round pink thumb.
+   Both the WebKit and the Firefox pseudo elements are styled, so it looks
+   the same in every browser. */
+.slider-card input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+
   width: 100%;
-  margin-top: 4px;
+  height: 30px;
+  margin: 0.3rem 0 0;
+
+  background: transparent;
+  accent-color: var(--hot-light);
+  cursor: pointer;
+}
+
+.slider-card input[type="range"]::-webkit-slider-runnable-track {
+  height: 10px;
+  border: 2px solid var(--plum);
+  border-radius: 999px;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      transparent 0 8px,
+      rgba(143, 62, 103, 0.22) 8px 10px
+    ),
+    #fff;
+}
+
+.slider-card input[type="range"]::-moz-range-track {
+  height: 10px;
+  border: 2px solid var(--plum);
+  border-radius: 999px;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      transparent 0 8px,
+      rgba(143, 62, 103, 0.22) 8px 10px
+    ),
+    #fff;
+}
+
+.slider-card input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+
+  width: 26px;
+  height: 26px;
+  margin-top: -9px;
+
+  background: var(--hot);
+  border: 3px solid #fff;
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 2px var(--plum),
+    3px 3px 0 rgba(143, 62, 103, 0.35);
+}
+
+.slider-card input[type="range"]::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+
+  background: var(--hot);
+  border: 3px solid #fff;
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 2px var(--plum),
+    3px 3px 0 rgba(143, 62, 103, 0.35);
+}
+
+.slider-card input[type="range"]:focus-visible {
+  outline: 3px solid var(--ink);
+  outline-offset: 2px;
+  border-radius: 8px;
 }
 
 /* ==============================
-   SMALL CATEGORY TITLES
+   STICKER ARCHIVE
+   Make sticker controls feel like a small sticker archive sheet.
 ================================= */
+.sticker-panel {
+  padding: 1.7rem 1.3rem 1.3rem;
+
+  box-shadow: var(--sh-lg);
+  transform: rotate(-1deg);
+}
+
+/* "sweet mode" is a sticker stuck to the corner of the panel, above the title */
+.label-sweet {
+  position: absolute;
+  top: -30px;
+  right: -8px;
+  z-index: 3;
+
+  transform: rotate(5deg);
+  pointer-events: none;
+}
+
+.label-sweet span {
+  display: block;
+  padding: 0.45rem 0.9rem;
+
+  background: var(--mint);
+  color: var(--ink);
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%, 4% 50%);
+
+  font-family: var(--font-serif);
+  font-size: 1rem;
+  font-style: italic;
+  font-weight: 700;
+  line-height: 1.05;
+  text-align: center;
+}
+
+.sticker-row,
+.sticker-style {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+
+  margin-bottom: 1rem;
+}
 
 .sticker-title,
 .sticker-style span {
-  margin-right: 12px;
+  display: block;
+  width: 100%;
+  padding-bottom: 4px;
+  margin-bottom: 2px;
 
-  font-family: "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
-  font-size: 10px;
-  font-weight: 700;
+  border-bottom: 2px dotted rgba(143, 62, 103, 0.3);
 
-  letter-spacing: 5px;
-
-  color: rgba(35, 20, 25, 0.82);
-
-  /* Reason:
-     Thin, spaced-out sans-serif text feels more like magazine annotation text. */
+  font-size: 0.8125rem;
+  font-weight: 800;
+  letter-spacing: 0.28em;
+  color: var(--plum-deep);
 }
 
-/* ==============================
-   BASIC BUTTON SHAPE
-================================= */
-
-.sticker-btn,
-.style-btn,
-#deleteStickerBtn,
-#undoBtn {
-  border: none;
-
-  padding: 7px 14px;
-
-  cursor: pointer;
-
-  box-shadow: 7px 7px 0 rgba(224, 91, 126, 0.18);
-
-  transition: 0.15s ease;
-
-  /* Reason:
-     No white border. The offset shadow creates a printed paper-layer effect. */
-}
-
-/* ==============================
-   STICKER BUTTONS
-================================= */
-
+/* stickers: white die-cut border + soft drop, three alternating colours */
 .sticker-btn {
-  background: rgba(248, 226, 174, 0.82);
+  min-width: 2.4rem;
+  min-height: 38px;
+  padding: 0.2rem 0.7rem;
 
-  color: #8f3e67;
+  background: var(--cream);
+  color: var(--plum);
+  border: 3px solid #fff;
+  border-radius: 8px;
+  box-shadow: 0 3px 0 rgba(176, 88, 128, 0.4);
 
-  border: none;
-
-  padding: 8px 16px;
-
-  font-family: Georgia, "Times New Roman", serif;
-
-  font-size: 19px;
-
+  font-family: var(--font-serif);
+  font-size: 1rem;
   font-style: italic;
   font-weight: 700;
-
-  box-shadow: 7px 7px 0 rgba(224, 91, 126, 0.16);
-
-  transform: rotate(-2deg);
+  line-height: 1.2;
 
   cursor: pointer;
+  transform: rotate(-2deg);
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
 }
-/* Reason:
-   Alternating soft green and cream makes the stickers feel collected,
-   like different magazine labels. */
-.sticker-btn:nth-child(odd) {
-  background: rgba(174, 212, 162, 0.62);
+
+.sticker-btn:nth-of-type(even) {
   transform: rotate(2deg);
 }
 
-/* English title-like stickers */
-.sticker-btn[data-sticker="TOKYO"],
-.sticker-btn[data-sticker="1998"],
-.sticker-btn[data-sticker="CUTIE"] {
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 20px;
-  font-style: italic;
-  font-weight: 700;
-
-  letter-spacing: -0.5px;
+.sticker-btn:nth-of-type(3n + 1) {
+  background: var(--mint);
+  color: var(--ink);
 }
 
-/* Japanese sticker */
-.sticker-btn[data-sticker="カワイイ"] {
-  font-family: "Hiragino Maru Gothic Pro", "Yu Gothic", sans-serif;
-  font-size: 17px;
-  font-style: normal;
-  font-weight: 700;
-
-  letter-spacing: 2px;
+.sticker-btn:nth-of-type(3n) {
+  background: #fbd0e0;
 }
 
-/* ==============================
-   STYLE BUTTONS
-================================= */
-
-.style-btn {
-  background: rgba(248, 226, 174, 0.82);
-  color: #8f3e67;
-
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 15px;
-  font-style: italic;
-  font-weight: 700;
-
-  letter-spacing: 1px;
-  text-transform: uppercase;
-}
-
-/* Reason:
-   Active button should look like a selected magazine label,
-   not a modern UI tab. */
-.style-btn.active {
-  background: rgba(224, 91, 126, 0.86);
-  color: white;
-
-  transform: rotate(-2deg);
-
-  box-shadow: 7px 7px 0 rgba(176, 88, 128, 0.24);
-}
-
-/* ==============================
-   ACTION BUTTONS
-================================= */
-
-#deleteStickerBtn,
-#undoBtn {
-  font-family: "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
-  font-size: 12px;
+.sticker-btn[lang="ja"] {
+  font-family: var(--font-jp);
   font-style: normal;
   font-weight: 900;
+  font-size: 0.9rem;
+}
 
-  letter-spacing: 2px;
-  text-transform: uppercase;
+.sticker-btn:hover {
+  transform: translateY(-3px) rotate(-2deg);
+  box-shadow: 0 6px 0 rgba(176, 88, 128, 0.35);
+}
+
+.sticker-btn:nth-of-type(even):hover {
+  transform: translateY(-3px) rotate(2deg);
+}
+
+.sticker-btn:active {
+  transform: translateY(1px);
+  box-shadow: 0 1px 0 rgba(176, 88, 128, 0.4);
+}
+
+/* text style: segmented chips */
+.style-btn {
+  min-height: 34px;
+  padding: 0.2rem 0.65rem;
+
+  background: rgba(255, 255, 255, 0.75);
+  color: var(--plum-deep);
+  border: 2px solid var(--plum);
+
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    transform 0.15s ease;
+}
+
+.style-btn:hover {
+  background: #fff;
+  transform: translateY(-2px);
+}
+
+.style-btn.active,
+.style-btn.active:hover {
+  background: var(--hot);
+  border-color: var(--hot);
+  color: #fff;
+}
+
+/* ---- delete / clear / undo: functional controls, separated from the
+   stickers by a dotted line and a different visual weight ---- */
+.sticker-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+
+  margin-top: 0.4rem;
+  padding-top: 1rem;
+  border-top: 2px dotted rgba(143, 62, 103, 0.3);
 }
 
 #deleteStickerBtn {
-  background: rgba(176, 88, 128, 0.8);
-  color: white;
+  grid-column: 1 / -1;
+}
+
+#deleteStickerBtn,
+#clearCanvasBtn,
+#undoBtn {
+  min-height: 40px;
+  padding: 0.5rem 0.8rem;
+
+  border: none;
+
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+
+  box-shadow: 4px 4px 0 rgba(176, 88, 128, 0.3);
+  cursor: pointer;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+#deleteStickerBtn {
+  background: var(--hot);
+  color: #fff;
+}
+
+#clearCanvasBtn {
+  background: var(--cream);
+  color: var(--plum);
+  border: 2px solid var(--ink);
 }
 
 #undoBtn {
-  background: rgba(111, 190, 177, 0.72);
-  color: #3c202d;
+  background: var(--teal);
+  color: var(--ink);
+}
+
+#deleteStickerBtn:hover,
+#clearCanvasBtn:hover,
+#undoBtn:hover {
+  transform: translate(-1px, -2px);
+  box-shadow: 6px 6px 0 rgba(176, 88, 128, 0.32);
+}
+
+#deleteStickerBtn:active,
+#clearCanvasBtn:active,
+#undoBtn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 rgba(176, 88, 128, 0.3);
 }
 
 /* ==============================
-   HOVER
+   DOWNLOAD AREA
+================================= */
+.download-area {
+  position: relative;
+  z-index: 30;
+
+  width: 100%;
+  margin: clamp(4px, 1vw, 12px) 0 clamp(44px, 7vw, 76px);
+  padding: 0 1rem;
+
+  text-align: center;
+}
+
+.download-area p {
+  margin: 0 0 1rem;
+
+  font-size: 1.125rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--plum-deep);
+  text-wrap: balance;
+}
+
+/* sparkles beside the download button (shape drawn with clip-path, not a glyph) */
+.deco-star,
+.download-area::before {
+  position: absolute;
+  background: var(--plum);
+  clip-path: url(#clipSparkle);
+  pointer-events: none;
+}
+
+.star-two {
+  top: 30px;
+  left: calc(50% + 235px);
+
+  width: 46px;
+  height: 46px;
+
+  opacity: 0.75;
+  transform: rotate(16deg);
+  animation: twinkle 3.2s ease-in-out infinite;
+}
+
+.download-area::before {
+  content: "";
+  top: 62px;
+  right: calc(50% + 235px);
+
+  width: 28px;
+  height: 28px;
+
+  background: var(--cream);
+  transform: rotate(-10deg);
+  animation: twinkle 3.2s ease-in-out 1.2s infinite;
+}
+
+@keyframes twinkle {
+  0%,
+  100% {
+    scale: 1;
+  }
+  50% {
+    scale: 0.82;
+  }
+}
+
+/* ==============================
+   INTRO DIALOG
+================================= */
+#introDialog {
+  width: min(620px, calc(100vw - 32px));
+  max-height: calc(100vh - 32px);
+  max-height: calc(100dvh - 32px);
+  padding: 0;
+
+  border: none;
+  background: transparent;
+  overflow: visible;
+  color: var(--ink);
+}
+
+#introDialog[open] {
+  animation: dialogPop 0.32s cubic-bezier(0.2, 1.3, 0.4, 1) both;
+}
+
+#introDialog::backdrop {
+  /* plain colour, no blur: cheaper and glitch-free on every GPU */
+  background: rgba(60, 20, 40, 0.5);
+}
+
+@keyframes dialogPop {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.dialog-paper {
+  position: relative;
+  max-height: calc(100vh - 32px);
+  max-height: calc(100dvh - 32px);
+  padding: 2rem clamp(1.2rem, 5vw, 2.2rem) 1.8rem;
+
+  overflow: auto;
+
+  background: linear-gradient(
+    135deg,
+    rgba(255, 231, 241, 0.98),
+    rgba(248, 226, 174, 0.9)
+  );
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  box-shadow:
+    12px 12px 0 rgba(176, 88, 128, 0.32),
+    inset 0 0 28px rgba(255, 255, 255, 0.25);
+
+  transform: rotate(-1.2deg);
+  font-family: var(--font-sans);
+}
+
+/* tape holding the note */
+.dialog-paper::before {
+  content: "";
+  position: absolute;
+  top: -2px;
+  left: 50%;
+
+  width: 110px;
+  height: 26px;
+
+  background: var(--tape);
+  clip-path: polygon(
+    0 0,
+    100% 0,
+    97% 25%,
+    100% 50%,
+    97% 75%,
+    100% 100%,
+    0 100%,
+    3% 75%,
+    0 50%,
+    3% 25%
+  );
+  transform: translateX(-50%) rotate(-2deg);
+  pointer-events: none;
+}
+
+/* Hand-drawn star: keeps the sticky-note feel and softens the disclaimer.
+   It stays inside the paper and behind the text. */
+.dialog-paper::after {
+  content: "";
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 0;
+
+  width: clamp(80px, 24%, 150px);
+  aspect-ratio: 1;
+
+  background: url("images/star-doodle.png") center / contain no-repeat;
+  opacity: 0.8;
+  transform: rotate(20deg);
+  pointer-events: none;
+}
+
+.dialog-paper > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* small Japanese magazine-style heading */
+.dialog-kicker {
+  width: fit-content;
+  margin-bottom: 14px;
+  padding: 0.35rem 0.9rem;
+
+  background: var(--hot);
+  color: #fff;
+  box-shadow: 5px 5px 0 rgba(176, 88, 128, 0.25);
+
+  font-family: var(--font-jp);
+  font-size: 0.75rem;
+  font-weight: 900;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+
+  transform: rotate(-3deg);
+}
+
+.dialog-paper h2 {
+  margin: 0 0 1rem;
+
+  font-family: var(--font-serif);
+  font-size: clamp(1.9rem, 7vw, 2.7rem);
+  font-style: italic;
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  color: var(--plum);
+  text-shadow: 3px 3px 0 rgba(224, 91, 126, 0.18);
+}
+
+.dialog-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  padding-top: 1.1rem;
+  border-top: 2px dotted rgba(143, 62, 103, 0.4);
+
+  text-align: center;
+}
+
+.dialog-content p {
+  max-width: 34rem;
+  margin: 0 0 1rem;
+
+  font-size: 1.0625rem;
+  font-weight: 600;
+  line-height: 1.55;
+  letter-spacing: 0.02em;
+  color: var(--ink);
+  text-wrap: balance;
+}
+
+.dialog-content .dialog-small {
+  margin: 0.4rem 0 0.4rem;
+
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--plum-deep);
+}
+
+#dialogCloseButton {
+  display: block;
+  margin: 0.6rem auto 0;
+  padding: 0.55rem 1.4rem;
+
+  border: none;
+  background: var(--cream);
+  color: var(--plum);
+  box-shadow: 6px 6px 0 rgba(224, 91, 126, 0.28);
+
+  font-family: var(--font-serif);
+  font-size: 1.1rem;
+  font-style: italic;
+  font-weight: 700;
+
+  cursor: pointer;
+  transform: rotate(-2deg);
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+#dialogCloseButton:hover {
+  transform: translate(-1px, -3px) rotate(-2deg);
+  box-shadow: 8px 9px 0 rgba(224, 91, 126, 0.3);
+}
+
+#dialogCloseButton:active {
+  transform: translate(2px, 2px) rotate(-2deg);
+  box-shadow: 2px 2px 0 rgba(224, 91, 126, 0.3);
+}
+
+/* ==============================
+   RESPONSIVE
 ================================= */
 
-.sticker-btn:hover,
-.style-btn:hover,
-#deleteStickerBtn:hover,
-#undoBtn:hover {
-  transform: translateY(-2px) rotate(-1deg);
-  opacity: 0.92;
+/* hero gutters need about 190px each side; below that the decorations
+   would crowd the button, so they are dropped and the title decorations
+   plus the arrow note carry the style */
+@media (max-width: 959px) {
+  .canvas-sticker-label {
+    left: -6px;
+  }
+
+  .hero {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .hero-side {
+    display: none;
+  }
+
+  .hero-core {
+    grid-column: 1;
+  }
+}
+
+/* small tablets and big phones */
+@media (max-width: 759px) {
+  .tape-left {
+    left: -1.1rem;
+  }
+
+  .deco-issue {
+    right: -0.9rem;
+  }
+
+  .filter-card,
+  .sticker-panel,
+  .brightness-card,
+  .contrast-card {
+    transform: none;
+  }
+}
+
+/* phones */
+@media (max-width: 520px) {
+  body {
+    padding-top: 68px;
+  }
+
+  header {
+    transform: rotate(-3deg);
+  }
+
+  .title-plate::after {
+    letter-spacing: 0.18em;
+  }
+
+  .deco-tape span {
+    padding: 0.35rem 1.2rem;
+    font-size: 0.85rem;
+  }
+
+  .tape-left {
+    top: -1.7rem;
+    left: -0.4rem;
+    transform: rotate(-12deg);
+  }
+
+  .deco-issue {
+    top: -3rem;
+    right: -0.2rem;
+    padding: 0.35rem 0.6rem;
+    font-size: 0.75rem;
+  }
+
+  .deco-issue strong {
+    font-size: 1.5rem;
+  }
+
+  .deco-heart {
+    width: 4.4rem;
+    height: 4.1rem;
+    bottom: -2.8rem;
+  }
+
+  .deco-heart span {
+    font-size: 0.75rem;
+  }
+
+  header {
+    margin-bottom: 3.6rem;
+  }
+
+  .canvas-sticker-label {
+    top: -34px;
+    left: -6px;
+    width: 64px;
+    height: 64px;
+  }
+
+  .canvas-sticker-label span {
+    font-size: 1.05rem;
+  }
+
+  .canvas-note {
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+  }
+
+  .label-sweet {
+    right: -2px;
+  }
+
+  .star-two,
+  .download-area::before {
+    display: none;
+  }
+
+  .note-one {
+    left: calc(50% + 40px);
+  }
+}
+
+/* touch screens: bigger tap targets */
+@media (pointer: coarse) {
+  .filter-item button,
+  .style-btn,
+  .sticker-btn,
+  #deleteStickerBtn,
+  #clearCanvasBtn,
+  #undoBtn,
+  #dialogCloseButton {
+    min-height: 44px;
+  }
+}
+
+/* people who asked their system for less motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
 }
